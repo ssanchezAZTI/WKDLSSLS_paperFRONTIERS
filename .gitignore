@@ -1,0 +1,8 @@
+*.Rproj
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+/output/output_scenarios/
+/output_Baranov/output_scenarios/
+/plots/
