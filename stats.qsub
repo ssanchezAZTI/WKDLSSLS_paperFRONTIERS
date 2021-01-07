@@ -1,0 +1,10 @@
+#!/bin/bash
+#$ -cwd
+#$ -o qsub_out/job-$JOB_ID.stdout
+#$ -e qsub_out/job-$JOB_ID.stderr
+#$ -S /bin/bash
+. /etc/profile
+# module add R
+echo Starting job $JOB_ID
+echo ${SC}
+R CMD BATCH --no-save R/06_results_sumStats.R qsub_out/R-${JOB_ID}.Rout

@@ -1,0 +1,38 @@
+
+# SIMULACIONES CLUSTER - COMANDOS PRINCIPALES
+
+cd paperWKDLSSLS
+
+# Generate data for iterations by om
+# (oms = number of rows in list_oms.csv)
+# (base case: rows 1:6 + sensOM: rows 7:54 + sensCVID: rows 55:72)
+qsub -t 1:72 iters.qsub
+
+qsub -t 1:24 itersf0.qsub
+qsub -t 1:72 iterssigR0.qsub
+
+# Comparison of OM: in terms of IAV and depletion level
+qsub OManalysis.qsub
+
+# Run the simulations scenario by scenario
+# (scenarios = number of rows in list_scenarios.csv)
+qsub -t 1:1158 sims.qsub    # Base case runs (BSAFE: rows 1087:1158)
+qsub -t 1159:1350 sims.qsub # Sensitivity to the OM (LHSC, SIGR)
+qsub -t 1351:1458 sims.qsub # Sensitivity to the sampling quality (CVID)
+                            
+
+# Summarise the statistics by scenario
+qsub -t 1:1458 stats.qsub
+
+
+# Consultar estado mis tareas
+qstat -u ssanchez
+
+# Borrar tarea
+qdel NUMEROTASK
+
+# Alterar tarea
+# - Bajar la prioridad
+qalter -p -10 NUMEROTASK
+# - Limitar el numero de nodos usados a 100
+qalter -tc 100 NUMEROTASK
