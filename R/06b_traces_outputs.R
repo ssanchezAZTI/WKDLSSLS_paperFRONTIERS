@@ -6,19 +6,27 @@ res.dir <- "./output"
 files <- list.files(file.path(res.dir,"output_scenarios"))
 sl <- unique(sapply(gsub('.{6}$', '', files),function(x){strsplit(x,"_")[[1]][2]}))
 
-# SCENARIOS: fopt, 1o2_(0.8,0.8) & 1o2_(0.5,1.5)
-sl <- c( "sc000062", "sc000063", "sc000064", # STK1 + 1o2_(0.5,1.5)
-         "sc000074", "sc000075", "sc000076", # STK1 + 1o2_(0.8,0.8)
-         "sc000641", "sc000642", "sc000643", # STK2 + 1o2_(0.5,1.5)
-         "sc000653", "sc000654", "sc000655") # STK1 + 1o2_(0.8,0.8)
 
-# # SCENARIOS: fhig, 1o2_(0.8,0.8) & 1o2_(0.5,1.5)
-# sl <- c( "sc000448", "sc000449", "sc000450", # STK1 + 1o2_(0.5,1.5)
-#          "sc000460", "sc000461", "sc000462", # STK1 + 1o2_(0.8,0.8)
-#          "sc001027", "sc001028", "sc001029", # STK2 + 1o2_(0.5,1.5)
-#          "sc001039", "sc001040", "sc001041") # STK1 + 1o2_(0.8,0.8)
+# SCENARIOS with "problems" in calendar comparison
 
-it <- 2
+# STK2_fhigh
+# HCRT         UC      int      iny      fpa
+#  1o2  (0.2,0.2) sc000981 sc000979 sc000980
+#  1o2 (0.2,0.25) sc000993 sc000991 sc000992
+#  1o3 (0.2,0.25) sc000996 sc000994 sc000995
+#  1o5 (0.2,0.25) sc001002 sc001000 sc001001
+#  2o3  (0.2,0.2) sc000987 sc000985 sc000986
+#  2o3 (0.2,0.25) sc000999 sc000997 sc000998
+
+sl <- c( "sc000979", "sc000980", "sc000981", # STK2 + fhigh + 1o2_(0.2,0.2)
+         "sc000985", "sc000986", "sc000987", # STK2 + fhigh + 2o3_(0.2,0.2)
+         "sc000991", "sc000992", "sc000993", # STK2 + fhigh + 1o2_(0.2,0.25)
+         "sc000994", "sc000995", "sc000996", # STK2 + fhigh + 1o3_(0.2,0.25) 
+         "sc000997", "sc000998", "sc000999", # STK2 + fhigh + 2o3_(0.2,0.25) 
+         "sc001000", "sc001001", "sc001002") # STK2 + fhigh + 1o5_(0.2,0.25)
+    
+
+it <- 464
 
 out <- NULL
 
@@ -55,7 +63,7 @@ for (scenario in sl){
     obj.idx <- obj.idx %>% select(year, iter, data)%>%
       mutate(year=as.character(year),
              iter=as.character(iter)) %>%
-      rename(index=data)
+      dplyr::rename(index=data)
     
     obj.bio <- left_join(obj.bio, obj.idx, by=c("year","iter")) 
   }else{
@@ -69,7 +77,7 @@ for (scenario in sl){
   # seasonal values 
   
   tmp <- obj.biosem %>% group_by(stock, scenario, iter, year) %>%
-    summarize(biomass.sem1 = biomass[season==1], 
+    dplyr::summarize(biomass.sem1 = biomass[season==1], 
               biomass.sem2 = biomass[season==2], 
               catch.sem1=catch[season==1], 
               catch.sem2=catch[season==2], 
@@ -91,7 +99,7 @@ for (scenario in sl){
   
   # add tac 
   
-  obj.bio <-  left_join(obj.bio, select(obj.adv, stock, scenario, iter, year, tac), by=c("stock", "scenario", "iter", "year")) 
+  obj.bio <- left_join(obj.bio, select(obj.adv, stock, scenario, iter, year, tac), by=c("stock", "scenario", "iter", "year")) 
   
   # compute quotaUp based on management calendar
   
@@ -110,7 +118,17 @@ for (scenario in sl){
   
 }
 
+# Add information on scenario
+
+# add the other variables for scenario description
+ 
+sc.dat <- read.table(file.path("input","list_scenarios.csv"), header=T, sep=",") %>% 
+  dplyr::rename(scenario=SCENARIO)
+
+out <- out %>% left_join(sc.dat, by="scenario") %>% 
+  select(scenario, OM:BSAFE, year:index)
+
+
 # Save the data
-write.table(out, file=file.path(res.dir,"traces_fopt_allCalendars.csv"), sep=";", row.names=F, append=F)
-# write.table(out, file=file.path(res.dir,"traces_fhigh_allCalendars.csv"), sep=";", row.names=F, append=F)
+write.table(out, file=file.path(res.dir,"traces_STK2fhigh_allCalendars_HCRselection.csv"), sep=";", row.names=F, append=F)
 
