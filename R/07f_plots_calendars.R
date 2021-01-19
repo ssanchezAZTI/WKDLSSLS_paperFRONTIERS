@@ -17,6 +17,9 @@
 
 rm(list=ls())
 
+set.seed(215)
+
+
 #==============================================================================
 # WORKING DIRECTORY                                                        ----
 #==============================================================================
@@ -25,7 +28,8 @@ rm(list=ls())
 inp.dir <- "./input"
 
 # directory with results
-res.dir <- "./output"
+res.dir   <- "./output"
+ressc.dir <- file.path(res.dir,"output_scenarios")
 
 # directory with plots
 plot.dir <- "./plots/BC_calendar"
@@ -753,13 +757,18 @@ dev.off()
 # TRAJECTORIES: n-over-m rules
 #==============================================================================
 
+# select specific iterations
+#-----------------------------
+
+sc0 <- unique(dat_bio$scenario)[1]
+nit.sample <- 2
+
+it.sel <- sample( loadToEnv(file.path(ressc.dir,paste0("out_",sc0,".RData")))[[paste(sc0,"bio",sep="_")]] %>% 
+                    .$iter %>% unique(), nit.sample)
+# 464 319
+
 
 # restricted to STK2_fhigh (as anomalies in results)
-
-aux <- dat_bio %>% filter(LHSC == "bc" & SIGR == 0.75 & CVID == "low" & ADVT == "iny" &
-                            HCRT != "ft0" & BSAFE == "none" & HCRI == "nin") %>%
-    select(-LHSC, -SIGR, -CVID, -ADVT, -HCRI) %>%
-    mutate(OMnam = factor(OMnam, levels = OMnam.levels))
 
 dd <- dat_bioQ %>% filter(indicator %in% c("ssb","catch")) %>% 
   filter(LHSC == "bc" & SIGR == 0.75 & CVID == "low" & 
@@ -773,95 +782,75 @@ dd <- dat_bioQ %>% filter(indicator %in% c("ssb","catch")) %>%
                         TRUE ~ UC))
 
 
-# for (id in c("ssb","catch")) { # unique(dat$indicator)
-#   
-#   pdf(file.path(plot.dir,paste0("trajectories_",id,"_UC(02_025).pdf")), width=14, onefile=T)
-#   
-#   aux <- dd %>% filter(UCPL==0.2 & UCPU==0.25) %>% filter(indicator == id)
-#   
-#   # scnam  <- unique(aux$SCnam)
-#   refpts <- loadToEnv(file.path(inp.dir,paste0(unique(aux$LHnam),"_dataLH.RData")))[["ref.pts"]]
-#   
-#   p <- ggplot(data = aux, aes(x = year, y = q50)) + #, color = ADVT
-#     geom_line() + 
-#     geom_ribbon(aes(x = year, ymin = q05, ymax = q95), alpha = 0.5) + #, fill = ADVT
-#     facet_grid(HCRT~indicator+ADVT, scales = "free") + 
-#     expand_limits(y=0) +
-#     geom_vline(xintercept = proj.yr - 0.5, linetype = "longdash") +
-#     theme_bw() + 
-#     theme(text = element_text(size = 20), 
-#           title = element_text(size = 16, face = "bold"), 
-#           strip.text = element_text(size = 20)) + 
-#     ylab("") + 
-#     # ggtitle(scnam) + 
-#     theme(plot.title = element_text(hjust = 0.5))
-#   if (id=="ssb") {
-#     p <- p + 
-#       geom_hline(lty = 2, data = data.frame(indicator = "ssb", Blim = refpts[["Blim"]]),
-#                  aes(yintercept = Blim), color ="orange") +
-#       geom_hline(lty = 2, data = data.frame(indicator = "ssb", Bcollapse = 0.1*refpts[["B0"]]), 
-#                  aes(yintercept = Bcollapse), color = "red")
-#   } else if (id=="catch")
-#     p <- p + geom_hline(lty = 2, data = data.frame(indicator ="catch", MSY=refpts[["MSY"]]), 
-#                         aes(yintercept = MSY), color = "green")
-#   
-#   print(p)
-#   
-#   dev.off()
-#   
-# }
-# 
-# 
-# 
-# 
-# 
-# 
-# jpeg(file.path(plot.dir,"trajectories_STK2fhigh.jpeg"), quality=100, width=1400, height=700)
-# 
-#   p <- ggplot(data = aux, aes(x = year, y = Risk.Blim, col=UC)) +
-#     geom_line() +
-#     facet_grid(OMnam ~ HCRT, scales = "free") +
-#     scale_color_manual(values = ucp.col)+
-#     # geom_vline(xintercept = c(35.5, 50.5), linetype = "longdash") +
-#     geom_hline(yintercept = 0.05, linetype = "longdash") +
-#     theme_bw() +
-#     theme(text = element_text(size = 20),
-#           title = element_text(size = 16, face = "bold"),
-#           strip.text = element_text(size = 20))
-# 
-#   print(p)
-# 
-# dev.off()
-# 
-# df_bc %>%
-#   filter(indicator=="Risk3.Blim" & term == "short" & HCRT == "1o3" & ADVT == "iny" & UC == "(0.2,0.2)") %>%
-#   select(STKN, FHIST, value) %>%
-#   group_by(STKN) %>%
-#   summarise(risk.min = round(min(value),2), risk.max = round(max(value),2))
-# 
-# #  STKN  risk.min risk.max
-# #   <chr>    <dbl>    <dbl>
-# # 1 STK1      0.08     0.47
-# # 2 STK2      0        0.42
-# 
-# 
-# # - catch.MSY
-# 
-# jpeg(file.path(plot.dir,paste("trajectories_ryield.jpeg",sep="")), quality=100, width=1400, height=700)
-# 
-#   p <- ggplot(data = aux, aes(x = year, y = catch.MSY, col=UC)) +
-#     geom_line() +
-#     facet_grid(OMnam ~ HCRT, scales = "free") +
-#     scale_color_manual(values = ucp.col)+
-#     # geom_vline(xintercept = c(35.5, 50.5), linetype = "longdash") +
-#     geom_hline(yintercept = 1, linetype = "longdash") +
-#     theme_bw() +
-#     theme(text = element_text(size = 20),
-#           title = element_text(size = 16, face = "bold"),
-#           strip.text = element_text(size = 20))
-# 
-#   print(p)
-# 
-# dev.off()
-# 
-# 
+ids <- c("ssb","catch")
+
+for (id in ids) for (ucpu in c(0.2,0.25)){ # unique(dat$indicator)
+
+  jpeg(file.path(plot.dir,paste0("trajectories_",id,"_STK2fhigh_UC(020_0",ucpu*100,").jpeg")), quality=100, width=1400, height=700)
+
+  aux <- dd %>% filter(UCPL==0.2 & UCPU==ucpu) %>% filter(indicator == id)
+
+  refpts <- loadToEnv(file.path(inp.dir,paste0(unique(aux$LHnam),"_dataLH.RData")))[["ref.pts"]]
+  
+  # all iterations (wide format)
+  
+  dd.its <- NULL
+  
+  for (sc in unique(aux$scenario)) {
+    
+    # specific scenario
+    
+    sc.its <- loadToEnv(file.path(ressc.dir,paste0("out_",sc,".RData")))[[paste(sc,"bio",sep="_")]]
+    
+    # specific iteration
+    
+    sc.its <- sc.its %>% filter(iter %in% it.sel) %>% 
+      select(scenario,stock,year,iter,one_of(ids)) %>% 
+      mutate(iter = as.factor(iter))
+    
+    dd.its <- rbind(dd.its, sc.its)
+    
+  }
+  
+  # add information on scenario
+  
+  dd.its <- dd.its %>% rename(SCENARIO = scenario) %>% 
+    left_join(sc.dat, by="SCENARIO") %>% select( names(sc.dat), names(dd.its[-1])) %>% 
+    mutate(ADVT = ordered(ADVT, levels=c("fix","int","iny","fpa")))
+  
+  # reshape to the long format for ggplot
+  
+  aux2 <- reshape( dd.its, direction="long", varying=names(dd.its)[-c(1:20)], v.names=c("value"),
+                   idvar=names(dd.its)[c(1:20)], timevar="indicator", times=names(dd.its)[-c(1:20)])
+  
+  p <- ggplot(data = aux, aes(x = year, y = q50)) + #, color = ADVT
+    geom_line() +
+    geom_ribbon(aes(x = year, ymin = q05, ymax = q95), alpha = 0.5) + #, fill = ADVT
+    geom_line(data=aux2 %>% filter(indicator == id),
+              aes(year, y=value, group=iter, col=iter))+
+    facet_grid(HCRT~indicator+ADVT, scales = "free") +
+    expand_limits(y=0) +
+    geom_vline(xintercept = proj.yr - 0.5, linetype = "longdash") +
+    theme_bw() +
+    theme(text = element_text(size = 20),
+          title = element_text(size = 16, face = "bold"),
+          strip.text = element_text(size = 20)) +
+    ylab("") +
+    # ggtitle(scnam) +
+    theme(plot.title = element_text(hjust = 0.5))
+  if (id=="ssb") {
+    p <- p +
+      geom_hline(lty = 2, data = data.frame(indicator = "ssb", Blim = refpts[["Blim"]]),
+                 aes(yintercept = Blim), color ="orange") +
+      geom_hline(lty = 2, data = data.frame(indicator = "ssb", Bcollapse = 0.1*refpts[["B0"]]),
+                 aes(yintercept = Bcollapse), color = "red")
+  } else if (id=="catch")
+    p <- p + geom_hline(lty = 2, data = data.frame(indicator ="catch", MSY=refpts[["MSY"]]),
+                        aes(yintercept = MSY), color = "green")
+
+  print(p)
+
+  dev.off()
+
+}
+

@@ -112,15 +112,15 @@ sc.dat <- read.table(file.path("input","list_scenarios.csv"), header=T, sep=",")
          FHIST = factor(FHIST, levels=c("flow","fopt","fhigh")), 
          OMnam = paste(STKN,FHIST,sep="_"), 
          OMnam = factor(OMnam, levels=OMnam.levels), 
+         ADVT = ordered(ADVT, levels=c("fix","int","iny","fpa")),
          UC = paste0("(",UCPL,",",UCPU,")")) %>% 
   rename(scenario=SCENARIO) 
 
 dat_bio <- dat_bio %>% left_join(sc.dat, by="scenario")
 
-ucp.col <- c("darkmagenta",                               # (0,0)
-             "cadetblue1", "blue",                        # (0.2,x)
-             "olivedrab1", "springgreen", "springgreen4", # (0.5,x)
-             "yellow", "darkorange", "red", "darkred")    # (0.8,x)
+advt.col <- c("red",  # int 
+              "blue", #iny 
+              "springgreen") # fpa
 
 
 # select specific iterations
@@ -231,12 +231,12 @@ for (ucopt in unique(aux$UC)) {
   p <- ggplot(data = aux1, aes(x = year, y = Risk.Blim, col=ADVT)) +
     geom_line() +
     facet_grid(OMnam ~ HCRT, scales = "free") +
-    scale_color_manual(values = ucp.col)+
+    scale_color_manual(values = advt.col)+
     geom_hline(yintercept = 0.05, linetype = "longdash") +
     theme_bw() +
     theme(text = element_text(size = 20),
           title = element_text(size = 16, face = "bold"),
-          strip.text = element_text(size = 20)) +
+          strip.text = element_text(size = 12)) +
     ggtitle(paste("UC:",ucopt))
   
   print(p)
@@ -258,12 +258,12 @@ for (ucopt in unique(aux$UC)) {
   p <- ggplot(data = aux1, aes(x = year, y = catch.MSY, col=ADVT)) +
     geom_line() +
     facet_grid(OMnam ~ HCRT, scales = "free") +
-    scale_color_manual(values = ucp.col)+
+    scale_color_manual(values = advt.col)+
     geom_hline(yintercept = 1, linetype = "longdash") +
     theme_bw() +
     theme(text = element_text(size = 20),
           title = element_text(size = 16, face = "bold"),
-          strip.text = element_text(size = 20)) +
+          strip.text = element_text(size = 12)) +
     ggtitle(paste("UC:",ucopt))
   
   print(p)
