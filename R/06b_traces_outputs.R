@@ -24,7 +24,8 @@ sl <- c( "sc000979", "sc000980", "sc000981", # STK2 + fhigh + 1o2_(0.2,0.2)
          "sc000994", "sc000995", "sc000996", # STK2 + fhigh + 1o3_(0.2,0.25) 
          "sc000997", "sc000998", "sc000999", # STK2 + fhigh + 2o3_(0.2,0.25) 
          "sc001000", "sc001001", "sc001002") # STK2 + fhigh + 1o5_(0.2,0.25)
-    
+
+# sl <- c( "sc000846", "sc000847", "sc000848") # STK2 + fLOW + 1o2_(0.9,0.9)
 
 it <- 464
 
@@ -126,9 +127,11 @@ sc.dat <- read.table(file.path("input","list_scenarios.csv"), header=T, sep=",")
   dplyr::rename(scenario=SCENARIO)
 
 out <- out %>% left_join(sc.dat, by="scenario") %>% 
-  select(scenario, OM:BSAFE, year:index)
+  select(scenario, OM:BSAFE, year:index) %>% 
+  mutate(ptac = catch.mp/tac)
 
 
 # Save the data
 write.table(out, file=file.path(res.dir,"traces_STK2fhigh_allCalendars_HCRselection.csv"), sep=";", row.names=F, append=F)
+# write.table(out, file=file.path(res.dir,"traces_STK2flow_allCalendars_1o2UC0808.csv"), sep=";", row.names=F, append=F)
 
