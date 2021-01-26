@@ -322,9 +322,8 @@ ucp.col3 <- c("red",          # (0.2,0.2)
               "blue",         # (0.8,4)
               "darkmagenta")  # (NA,NA)
 
-             
 
-  
+
 #==============================================================================
 # IAV: among different OMs
 #==============================================================================
@@ -449,19 +448,20 @@ risks %>% group_by(OMnam) %>% summarise(risk_min = min(Risk3.Blim),
                                         risk_max = max(Risk3.Blim))
 #   OMnam      risk_min risk_max
 #   <fct>         <dbl>    <dbl>
-# 1 STK1_flow     0.029    0.135
-# 2 STK1_fopt     0.189    0.346
-# 3 STK1_fhigh    0.43     0.544
-# 4 STK2_flow     0        0.006
-# 5 STK2_fopt     0.012    0.143
-# 6 STK2_fhigh    0.297    0.604
+# 1 STK1_flow     0.06     0.242
+# 2 STK1_fopt     0.237    0.437
+# 3 STK1_fhigh    0.423    0.625
+# 4 STK2_flow     0.001    0.055
+# 5 STK2_fopt     0.035    0.263
+# 6 STK2_fhigh    0.319    0.585
+
 
 risks %>% group_by(STKN) %>% summarise(risk_min = min(Risk3.Blim), 
                                        risk_max = max(Risk3.Blim))
 #   STKN  risk_min risk_max
 #   <chr>    <dbl>    <dbl>
-# 1 STK1     0.029    0.544
-# 2 STK2     0        0.604
+# 1 STK1     0.06     0.625
+# 2 STK2     0.001    0.585
 
 # addedd risks for the 2o3 rule (to expected risks without catches)
 risks.2o3 <- risks %>% filter(HCRT == "2o3") %>% 
@@ -475,23 +475,23 @@ risks.2o3 %>% group_by(OMnam) %>%
 
 #   OMnam      f0Risk.min f0Risk.max addRisk.min addRisk.max
 #   <fct>           <dbl>      <dbl>       <dbl>       <dbl>
-# 1 STK1_flow       0.007      0.007      0.0650       0.128
-# 2 STK1_fopt       0.051      0.051      0.227        0.295
-# 3 STK1_fhigh      0.136      0.136      0.319        0.408
-# 4 STK2_flow       0          0          0            0.006
-# 5 STK2_fopt       0.003      0.003      0.019        0.140
-# 6 STK2_fhigh      0.136      0.136      0.234        0.468
+# 1 STK1_flow       0.007      0.007       0.137       0.235
+# 2 STK1_fopt       0.051      0.051       0.267       0.386
+# 3 STK1_fhigh      0.137      0.137       0.315       0.488
+# 4 STK2_flow       0          0           0.003       0.055
+# 5 STK2_fopt       0.003      0.003       0.104       0.26 
+# 6 STK2_fhigh      0.138      0.138       0.269       0.447
 
 risks.2o3_ucp0.2 <- risks.2o3 %>% filter(UC == "(0.2,0.2)") %>% 
   select(OMnam, Risk3.Blim, Risk3.Blim_f0, addRisk)
 risks.2o3_ucp0.2
 #        OMnam Risk3.Blim Risk3.Blim_f0 addRisk
-# 1  STK1_fopt      0.334         0.051   0.283
-# 2  STK1_flow      0.100         0.007   0.093
-# 3 STK1_fhigh      0.469         0.136   0.333
-# 4  STK2_fopt      0.022         0.003   0.019
-# 5  STK2_flow      0.000         0.000   0.000
-# 6 STK2_fhigh      0.511         0.136   0.375
+# 1  STK1_fopt      0.344         0.051   0.293
+# 2  STK1_flow      0.164         0.007   0.157
+# 3 STK1_fhigh      0.461         0.137   0.324
+# 4  STK2_fopt      0.121         0.003   0.118
+# 5  STK2_flow      0.007         0.000   0.007
+# 6 STK2_fhigh      0.438         0.138   0.300
 
 
 #==============================================================================
@@ -532,11 +532,11 @@ init.risks <- aux %>% select(STKN, FHIST, RiskBlim.ini, Risk3.Blim_f0_st, Risk3.
 init.risks
 #   STKN FHIST RiskBlim.ini Risk3.Blim_f0_st Risk3.Blim_f0_lt
 # 1 STK1  flow        0.018            0.007                0
-# 2 STK1  fopt        0.126            0.051                0
-# 3 STK1 fhigh        0.402            0.136                0
+# 2 STK1  fopt        0.124            0.051                0
+# 3 STK1 fhigh        0.400            0.137                0
 # 4 STK2  flow        0.000            0.000                0
-# 5 STK2  fopt        0.013            0.003                0
-# 6 STK2 fhigh        0.305            0.136                0
+# 5 STK2  fopt        0.012            0.003                0
+# 6 STK2 fhigh        0.302            0.138                0
 
 write.csv(init.risks, file=file.path(plot.dir,"tab2_initRisks.csv"), row.names=F)
 
@@ -554,13 +554,13 @@ dat_bio %>% ungroup() %>%
 #   <fct>      <chr>         <dbl>         <dbl>
 # 1 STK1_flow  fpa           0.811         0.811
 # 2 STK1_flow  int           0.811         0.811
-# 3 STK1_flow  iny           0.767         0.885
+# 3 STK1_flow  iny           0.797         0.890
 # 4 STK1_fopt  fpa           1.02          1.02 
 # 5 STK1_fopt  int           1.02          1.02 
-# 6 STK1_fopt  iny           0.961         1.04 
-# 7 STK1_fhigh fpa           0.968         0.968
-# 8 STK1_fhigh int           0.968         0.968
-# 9 STK1_fhigh iny           0.902         0.958
+# 6 STK1_fopt  iny           1.01          1.06 
+# 7 STK1_fhigh fpa           0.969         0.969
+# 8 STK1_fhigh int           0.969         0.969
+# 9 STK1_fhigh iny           0.910         0.962
 
 # Taking input data for: om001 - STK1	bc	0.75	fopt	0.1	b1p	low
 stk1_fl <- loadToEnv(file.path(inp.dir,"iters","data_om001.RData"))[["fleets"]]
@@ -729,6 +729,26 @@ jpeg(file.path(plot.dir,"fig06_trajectories_risks.jpeg"), quality=100, width=140
   
 dev.off()
 
+jpeg(file.path(plot.dir,"fig06_sameScale_trajectories_risks.jpeg"), quality=100, width=1400, height=700)
+
+  p <- ggplot(data = aux, aes(x = year, y = Risk.Blim, col=UC)) +
+    geom_line() +
+    facet_grid(OMnam ~ HCRT) +
+    scale_color_manual(values = ucp.col)+
+    # geom_vline(xintercept = c(35.5, 50.5), linetype = "longdash") +
+    geom_hline(yintercept = 0.05, linetype = "longdash") +
+    theme_bw() +
+    theme(text = element_text(size = 20),
+          title = element_text(size = 16, face = "bold"),
+          strip.text = element_text(size = 20))
+  
+  # p <- ggplot(aux_lt, aes(x=UC, y=value, fill=UC))
+  
+  print(p)
+
+dev.off()
+
+
 df_bc %>% 
   filter(indicator=="Risk3.Blim" & term == "short" & HCRT == "1o3" & ADVT == "iny" & UC == "(0.2,0.2)") %>% 
   select(STKN, FHIST, value) %>% 
@@ -737,8 +757,8 @@ df_bc %>%
 
 #  STKN  risk.min risk.max
 #   <chr>    <dbl>    <dbl>
-# 1 STK1      0.08     0.47
-# 2 STK2      0        0.42
+# 1 STK1      0.14     0.45
+# 2 STK2      0.01     0.39
 
   
 # - catch.MSY
@@ -980,6 +1000,23 @@ aux <- df_bc %>% subset(indicator %in% perfnms & LHSC == "bc" & SIGR == 0.75 & C
   
   jpeg(file.path(plot.dir,paste("fig09_risk_vs_ryield_1o2bsafe.jpeg",sep="")), quality=100, width=1400, height=700)
   
+    dd <- aux %>% filter(HCRT == "1o2" & term != "mid")
+    
+    p <- ggplot(dd, aes(x=catch.MSY, y=Risk3.Blim, shape=HCR, colour=UC))+
+      geom_point(size=3)+
+      geom_hline(yintercept = 0.05, linetype = "longdash")+
+      facet_grid(term ~ OMnam, scales = "free_y")+
+      scale_colour_manual(values = ucp.col3)+
+      theme(text = element_text(size = 20), 
+            title = element_text(size = 16, face = "bold"), 
+            strip.text = element_text(size = 20))
+    
+    print(p)
+  
+  dev.off()
+  
+  jpeg(file.path(plot.dir,paste("fig09b_risk_vs_ryield_1o2bsafe.jpeg",sep="")), quality=100, width=1400, height=700)
+  
     dd <- aux %>% filter(HCRT == "1o2") #!
     
     p <- ggplot(dd, aes(x=catch.MSY, y=Risk3.Blim, shape=HCR, colour=UC))+
@@ -999,18 +1036,18 @@ aux <- df_bc %>% subset(indicator %in% perfnms & LHSC == "bc" & SIGR == 0.75 & C
   
   jpeg(file.path(plot.dir,paste("fig09b_risk_vs_ryield_2o3bsafe.jpeg",sep="")), quality=100, width=1400, height=700)
   
-  dd <- aux %>% filter(HCRT == "2o3")
-  
-  p <- ggplot(dd, aes(x=catch.MSY, y=Risk3.Blim, shape=HCR, colour=UC))+
-    geom_point(size=3)+
-    geom_hline(yintercept = 0.05, linetype = "longdash")+
-    facet_grid(term ~ OMnam, scales = "free_y")+
-    scale_colour_manual(values = ucp.col3)+
-    theme(text = element_text(size = 20), 
-          title = element_text(size = 16, face = "bold"), 
-          strip.text = element_text(size = 20))
-  
-  print(p)
+    dd <- aux %>% filter(HCRT == "2o3")
+    
+    p <- ggplot(dd, aes(x=catch.MSY, y=Risk3.Blim, shape=HCR, colour=UC))+
+      geom_point(size=3)+
+      geom_hline(yintercept = 0.05, linetype = "longdash")+
+      facet_grid(term ~ OMnam, scales = "free_y")+
+      scale_colour_manual(values = ucp.col3)+
+      theme(text = element_text(size = 20), 
+            title = element_text(size = 16, face = "bold"), 
+            strip.text = element_text(size = 20))
+    
+    print(p)
   
   dev.off()
 
@@ -1022,17 +1059,17 @@ dd <- aux %>%
 
 jpeg(file.path(plot.dir,paste("figXX_ratRiskRyield.jpeg",sep="")), quality=100, width=1400, height=700)
 
-p <- ggplot(dd, aes(x=UC, y=ratio, shape=HCRT, colour=UC))+
-  geom_point(size=3)+
-  facet_grid(term ~ OMnam, scales = "free")+
-  ylab("Risk per tonne")+
-  scale_colour_manual(values = ucp.col)+
-  theme(axis.text.x=element_blank(), 
-        text = element_text(size = 20), 
-        title = element_text(size = 16, face = "bold"), 
-        strip.text = element_text(size = 20))
-
-print(p)
+  p <- ggplot(dd, aes(x=UC, y=ratio, shape=HCRT, colour=UC))+
+    geom_point(size=3)+
+    facet_grid(term ~ OMnam, scales = "free")+
+    ylab("Risk per tonne")+
+    scale_colour_manual(values = ucp.col)+
+    theme(axis.text.x=element_blank(), 
+          text = element_text(size = 20), 
+          title = element_text(size = 16, face = "bold"), 
+          strip.text = element_text(size = 20))
+  
+  print(p)
 
 dev.off()
 
@@ -1050,17 +1087,17 @@ dd <- aux %>%
 
 jpeg(file.path(plot.dir,paste("figXX_riskPERtonne.jpeg",sep="")), quality=100, width=1400, height=700)
 
-p <- ggplot(dd, aes(x=UC, y=ratio, shape=HCRT, colour=UC))+
-  geom_point(size=3)+
-  facet_grid(term ~ OMnam, scales = "free")+
-  ylab("Risk per tonne")+
-  scale_colour_manual(values = ucp.col)+
-  theme(axis.text.x=element_blank(), 
-        text = element_text(size = 20), 
-        title = element_text(size = 16, face = "bold"), 
-        strip.text = element_text(size = 20))
-
-print(p)
+  p <- ggplot(dd, aes(x=UC, y=ratio, shape=HCRT, colour=UC))+
+    geom_point(size=3)+
+    facet_grid(term ~ OMnam, scales = "free")+
+    ylab("Risk per tonne")+
+    scale_colour_manual(values = ucp.col)+
+    theme(axis.text.x=element_blank(), 
+          text = element_text(size = 20), 
+          title = element_text(size = 16, face = "bold"), 
+          strip.text = element_text(size = 20))
+  
+  print(p)
 
 dev.off()
 
