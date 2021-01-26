@@ -22,7 +22,7 @@ qsub -t 1351:1458 sims.qsub # Sensitivity to the sampling quality (CVID)
                             
 
 # Summarise the statistics by scenario
-qsub -t 1:1458 stats.qsub
+qsub stats.qsub
 
 
 # Consultar estado mis tareas
