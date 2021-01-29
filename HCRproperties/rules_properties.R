@@ -12,7 +12,7 @@ UCL<-c(seq(0.1,0.9,0.1)) #UCL
 k<-c(seq(1,6,1))      #k, multiplier to compute UCU (UCU=k*UCL)
 sigma<-c(seq(0.1,3,0.1)) #standar deviation of observed abundance
 for (n in 1:3){
-  for(m in c((n+1),n+2,5,6)){
+  for(m in c((n+1),n+2,5,9)){
 print(paste(n,m))
 
 x1 <- exp(1/2 * log( n/m * (exp(sigma^2)-1+m)/(exp(sigma^2)-1+n) ))
@@ -45,15 +45,15 @@ for (i in 1:length(x1)){
 trunc<-as.data.frame(trunc)
 
 
+###plots for the supplementary material
 
-ggplot(as.data.frame(trunc),aes(sig0,m1t,col=factor(k)))+geom_line(size=1)+facet_grid(UCL~paste0(n,"o",m))+
-geom_hline(yintercept=1, col=1, lty=2)+
-  geom_line(aes(sig0,m1),linetype=1,size=1,col=1)+theme_bw()+ylab("med(r_n,m)")+xlab("sigma2")
+trunc$ntext<-paste0("n=",trunc$n)
+ggplot((trunc),aes(sig0,m1,col=factor(m)))+geom_line(size=2)+facet_grid(~ntext)+
+   theme_bw(base_size=20)+xlab(expression(sigma^{2}))+ylab(expression(med(r[paste(n,",",m)])))+ labs(col = "m")
 
 
-ggplot(as.data.frame(trunc),aes(sig0,m1,col=paste0("n o ",m)))+geom_line(size=2)+facet_grid(~n)+
-  theme_bw()+xlab("sigma2")+ylab("med(r_n,m)")+ labs(col = "n-over-m")
+ggplot(subset(trunc,n<3&m %in% c(1,3,5)&UCL %in% c(0.2,0.5,0.8)),aes(sig0,m1t,col=factor(k)))+geom_line(size=1)+facet_grid(UCL~paste0(n,"o",m))+
+  geom_hline(yintercept=1, col=1, lty=2)+labs(col = "k")+
+  geom_line(aes(sig0,m1),linetype=1,size=1,col=1)+theme_bw(base_size=20)+xlab(expression(sigma^{2}))+ylab(expression(med(r[paste(n,",",m)])))
 
-ggplot(as.data.frame(trunc),aes(sig0,m1,col=paste0(n ,"o m")))+geom_line(size=2)+facet_grid(~m)+
-  theme_bw()+xlab("sigma2")+ylab("med(r_n,m)")+ labs(col = "n-over-m")
-
+                  
