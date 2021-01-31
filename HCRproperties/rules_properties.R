@@ -55,6 +55,6 @@ ggplot((trunc),aes(sig0,m1,col=factor(m)))+geom_line(size=2)+facet_grid(~ntext)+
 
 ggplot(subset(trunc,n<3&m %in% c(2,3,5)&UCL %in% c(0.2,0.5,0.8)),aes(sig0,m1t,col=factor(k)))+geom_line(size=1)+facet_grid(UCL~paste0(n,"o",m))+
   geom_hline(yintercept=1, col=1, lty=2)+labs(col = "k")+
-  geom_line(aes(sig0,m1),linetype=1,size=1,col=1)+theme_bw(base_size=20)+xlab(expression(sigma^{2}))+ylab(expression(med(r[paste(n,",",m)])))
+  geom_line(aes(sig0,m1),linetype=1,size=1,col=1)+theme_bw(base_size=20)+xlab(expression(sigma^{2}))+ylab(expression(med(r[paste(n,",",m)]^{tr})))
 
                   
