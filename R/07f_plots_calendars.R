@@ -507,11 +507,8 @@ for (tt in unique(df_bc$term)) {
   caldf %>% filter(iny_int >=0.01 & term == "short") %>% .$HCRT %>% unique()
   caldf %>% filter(iny_int >=0.01 & term == "short" & HCRT != "2o3")             # STK1_fhigh
   caldf %>% filter(iny_int >=0.01 & term == "short" & !HCRT %in% c("2o3","1o5")) # STK1_fhigh & never (0.8,0.8)
-  caldf %>% filter(iny_int >=0.01 & term == "long") %>% .$UC %>% unique()
-  caldf %>% filter(iny_int >=0.01 & term == "long") %>% .$HCRT %>% unique()
-  caldf %>% filter(iny_int >=0.01 & term == "long" & HCRT != "2o3")
-  caldf %>% filter(iny_int >=0.01 & term == "long" & !HCRT %in% c("2o3","1o5"))
-  caldf %>% filter(iny_int >0 & term == "long" & HCRT != "2o3")
+  caldf %>% filter(iny_int >=0.01 & term == "long") %>% .$UC %>% unique()        # (0.5,1.5) & (0.5,1)
+  caldf %>% filter(iny_int >=0.01 & term == "long") %>% .$HCRT %>% unique()      # 2o3
   
   # - differences by FHIST
   caldf %>% filter(term == "short") %>% 
@@ -520,20 +517,20 @@ for (tt in unique(df_bc$term)) {
                                   fpa_iny.min = min(fpa_iny), fpa_iny.max = max(fpa_iny))
   #   FHIST iny_int.min iny_int.max fpa_int.min fpa_int.max fpa_iny.min fpa_iny.max
   #   <fct>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>
-  # 1 flow       -0.091      0.001       -0.089     0.001       -0.0330      0.03  
-  # 2 fopt       -0.163     -0.0100      -0.188    -0.00500     -0.059       0.015 
-  # 3 fhigh      -0.251      0.0450      -0.280     0.001       -0.089       0.0480
+  # 1 flow       -0.13       -0.011      -0.153      -0.011     -0.0600       0.001
+  # 2 fopt       -0.181      -0.003      -0.201      -0.03      -0.096        0.023
+  # 3 fhigh      -0.134       0.074      -0.158       0.002     -0.105        0.017
   
   caldf %>% filter(term == "short") %>% 
     group_by(STKN, FHIST) %>% summarise(iny_int.min = min(iny_int), iny_int.max = max(iny_int))
   #   STKN  FHIST iny_int.min iny_int.max
   #   <chr> <fct>       <dbl>       <dbl>
-  # 1 STK1  flow       -0.091     -0.017 
-  # 2 STK1  fopt       -0.075     -0.0190
-  # 3 STK1  fhigh      -0.026      0.0450
-  # 4 STK2  flow       -0.023      0.001 
-  # 5 STK2  fopt       -0.163     -0.0100
-  # 6 STK2  fhigh      -0.251     -0.108 
+  # 1 STK1  flow       -0.13      -0.028 
+  # 2 STK1  fopt       -0.074     -0.003 
+  # 3 STK1  fhigh      -0.018      0.074 
+  # 4 STK2  flow       -0.1       -0.011 
+  # 5 STK2  fopt       -0.181     -0.043 
+  # 6 STK2  fhigh      -0.134      0.0250 
   
   caldf %>% filter(term == "long") %>% 
     group_by(FHIST) %>% summarise(iny_int.min = min(iny_int), iny_int.max = max(iny_int), 
@@ -541,9 +538,9 @@ for (tt in unique(df_bc$term)) {
                                           fpa_iny.min = min(fpa_iny), fpa_iny.max = max(fpa_iny))
   #   FHIST iny_int.min iny_int.max fpa_int.min fpa_int.max fpa_iny.min fpa_iny.max
   #   <fct>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>
-  # 1 flow       -0.038       0.007      -0.033       0.008     -0.021        0.02 
-  # 2 fopt       -0.141       0.031      -0.156       0.03      -0.043        0.035
-  # 3 fhigh      -0.856       0.083      -0.796       0.083     -0.0790       0.419
+  # 1 flow       -0.273      0.0380      -0.307      -0.001     -0.0960      0.0210
+  # 2 fopt       -0.434      0.0470      -0.469       0.021     -0.171       0.0390
+  # 3 fhigh      -0.429      0.035       -0.476       0.02      -0.208       0.039 
 
 
 # RELATIVE YIELDS
@@ -603,153 +600,153 @@ for (tt in unique(df_bc$term)) {
   risk_long 
   
   
-#==============================================================================
-# CHECK PROBLEMS OBSERVED
-#==============================================================================
-  
-# Note: see ./plots/BC_calendar/ryield_vs_risk_all_OMs_smlt.jpeg
-#       strange values for SKT2_fhigh
-  
-names(df_bc)
-
-# - rules with relative yields < 0.5
-
-df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & term=="long" & STKN=="STK2" & FHIST=="fhigh" & value <0.5) %>% 
-  select(SCENARIO, OMnam, ADVT, HCRT, UC, indicator, value)
-
-# Selection:             int       iny       fpa
-# - 2o3_(0.2,0.2)   sc000987
-# - 2o3_(0.2,0.25)  sc000999  sc000997  sc000998
-# - 1o2_(0.2,0.2)   sc000981
-# - 1o2_(0.2,0.25)  sc000993            sc000992
-# - 1o3_(0.2,0.25)  sc000996
-# - 1o5_(0.2,0.25)  sc001002
-
-df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
-                   STKN=="STK2" & FHIST=="fhigh") %>% 
-  select(OMnam, ADVT, HCRT, UC, value) %>% 
-  filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) %>% 
-  spread(ADVT, value)
-#        OMnam HCRT         UC        int       iny       fpa
-# 1 STK2_fhigh  1o2  (0.2,0.2) 0.45174894 1.0282512 1.0639618
-# 2 STK2_fhigh  1o2 (0.2,0.25) 0.03843695 0.9628941 0.2438019
-# 3 STK2_fhigh  1o3 (0.2,0.25) 0.06919253 1.2284903 1.0788156
-# 4 STK2_fhigh  1o5 (0.2,0.25) 0.47273023 1.2668448 1.2825625
-# 5 STK2_fhigh  2o3  (0.2,0.2) 0.06077578 1.2334014 1.2500266
-# 6 STK2_fhigh  2o3 (0.2,0.25) 0.01455146 0.2785906 0.2626940
-
-
-df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
-                   STKN=="STK2" & FHIST=="fhigh" & value <0.5) %>% 
-  select(SCENARIO, OMnam, ADVT, HCRT, UC, indicator, value)
-
-
-# - rules with risks > 0.85
-
-df_bc %>% filter(indicator == "Risk3.Blim" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
-                   STKN=="STK2" & FHIST=="fhigh" & value > 0.85) %>% 
-  select(SCENARIO, OMnam, ADVT, HCRT, UC, indicator, value)
-
-# Selection:             int       iny       fpa
-# - 2o3_(0.2,0.2)   sc000987
-# - 2o3_(0.2,0.25)  sc000999  sc000997  sc000998
-# - 1o2_(0.2,0.2)   sc000981
-# - 1o2_(0.2,0.25)  sc000993            sc000992
-# - 1o3_(0.2,0.25)  sc000996
-# - 1o5_(0.2,0.25)  sc001002
-
-
-df_bc %>% filter(indicator == "Risk3.Blim" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
-                   STKN=="STK2" & FHIST=="fhigh") %>% 
-  select(OMnam, ADVT, HCRT, UC, value) %>% 
-  filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) %>% 
-  spread(ADVT, value)
-#        OMnam HCRT         UC   int   iny   fpa
-# 1 STK2_fhigh  1o2  (0.2,0.2) 0.935 0.079 0.498
-# 2 STK2_fhigh  1o2 (0.2,0.25) 0.999 0.686 0.991
-# 3 STK2_fhigh  1o3 (0.2,0.25) 1.000 0.264 0.609
-# 4 STK2_fhigh  1o5 (0.2,0.25) 0.922 0.144 0.126
-# 5 STK2_fhigh  2o3  (0.2,0.2) 0.997 0.204 0.226
-# 6 STK2_fhigh  2o3 (0.2,0.25) 1.000 0.991 0.994
-
-
-aux <- df_bc %>% filter(indicator %in% c("catch.MSY","Risk3.Blim") & ADVT!="fix" & BSAFE=="none" & term=="long" & 
-                   STKN=="STK2" & FHIST=="fhigh") %>% 
-  select(OMnam, ADVT, HCRT, UC, indicator, value) %>% 
-  filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) %>% 
-  spread(ADVT, value)
-
-aux_ryield <- aux %>% filter(indicator == "catch.MSY") %>% select(-indicator)
-names(aux_ryield)[-c(1:3)] <- paste( names(aux_ryield)[-c(1:3)], "ryield", sep = "_")
-
-aux_risk   <- aux %>% filter(indicator == "Risk3.Blim") %>% select(-indicator)
-names(aux_risk)[-c(1:3)] <- paste( names(aux_risk)[-c(1:3)], "risk", sep = "_")
-
-bind_cols(aux_ryield, aux_risk[,-c(1:3)])
-#        OMnam HCRT         UC int_ryield iny_ryield fpa_ryield int_risk iny_risk fpa_risk
-# 1 STK2_fhigh  1o2  (0.2,0.2) 0.45174894  1.0282512  1.0639618    0.935    0.079    0.498
-# 2 STK2_fhigh  1o2 (0.2,0.25) 0.03843695  0.9628941  0.2438019    0.999    0.686    0.991
-# 3 STK2_fhigh  1o3 (0.2,0.25) 0.06919253  1.2284903  1.0788156    1.000    0.264    0.609
-# 4 STK2_fhigh  1o5 (0.2,0.25) 0.47273023  1.2668448  1.2825625    0.922    0.144    0.126
-# 5 STK2_fhigh  2o3  (0.2,0.2) 0.06077578  1.2334014  1.2500266    0.997    0.204    0.226
-# 6 STK2_fhigh  2o3 (0.2,0.25) 0.01455146  0.2785906  0.2626940    1.000    0.991    0.994
-
-
-# RULES TO BE ANALYSED for OM: STK2_fhigh
-# Selection:             int       iny       fpa
-# - 2o3_(0.2,0.2)   sc000987
-# - 2o3_(0.2,0.25)  sc000999  sc000997  sc000998
-# - 1o2_(0.2,0.2)   sc000981
-# - 1o2_(0.2,0.25)  sc000993            sc000992
-# - 1o3_(0.2,0.25)  sc000996
-# - 1o5_(0.2,0.25)  sc001002
-
-
-# RULES TO BE ANALYSED for OM: STK2_fhigh
-
-prl <- df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
-                   STKN=="STK2" & FHIST=="fhigh") %>% 
-  select(HCRT, UC, ADVT, SCENARIO) %>% 
-  filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
-            (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) 
-
-prl %>% spread(ADVT, SCENARIO)
-
-#   HCRT         UC      int      iny      fpa
-# 1  1o2  (0.2,0.2) sc000981 sc000979 sc000980
-# 2  1o2 (0.2,0.25) sc000993 sc000991 sc000992
-# 3  1o3 (0.2,0.25) sc000996 sc000994 sc000995
-# 4  1o5 (0.2,0.25) sc001002 sc001000 sc001001
-# 5  2o3  (0.2,0.2) sc000987 sc000985 sc000986
-# 6  2o3 (0.2,0.25) sc000999 sc000997 sc000998
-
-rules <- prl$SCENARIO 
-
-# problematic rules
-
-jpeg(file.path(plot.dir,"ryield_vs_risk_STK2fhigh_problems.jpeg",sep=""), quality=100, width=1400, height=700)
-
-  aux <- df_bc %>% filter(ADVT!= "fix" & BSAFE == "none" & indicator %in% perfnms & SCENARIO %in% rules)
-  
-  p <- ggplot(aux, aes(x=ADVT, y=value, group=interaction(HCRT,BSAFE,PBUF,UC,HCRI), col=HCRT, lty=UC))+
-    geom_line()+
-    geom_hline(aes(yintercept = 0.05), data = subset(aux, indicator == "Risk3.Blim"), linetype="dashed") +
-    facet_grid(indicator ~ OMnam + term, scales="free")+
-    scale_colour_manual(values = rule.col)+
-    ylab("")+
-    theme(text = element_text(size = 20), 
-          title = element_text(size = 16, face = "bold"), 
-          strip.text = element_text(size = 20))
-  print(p)
-
-dev.off()
+# #==============================================================================
+# # CHECK PROBLEMS OBSERVED
+# #==============================================================================
+#   
+# # Note: see ./plots/BC_calendar/ryield_vs_risk_all_OMs_smlt.jpeg
+# #       strange values for SKT2_fhigh
+#   
+# names(df_bc)
+# 
+# # - rules with relative yields < 0.5
+# 
+# df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & term=="long" & STKN=="STK2" & FHIST=="fhigh" & value <0.5) %>% 
+#   select(SCENARIO, OMnam, ADVT, HCRT, UC, indicator, value)
+# 
+# # Selection:             int       iny       fpa
+# # - 2o3_(0.2,0.2)   sc000987
+# # - 2o3_(0.2,0.25)  sc000999  sc000997  sc000998
+# # - 1o2_(0.2,0.2)   sc000981
+# # - 1o2_(0.2,0.25)  sc000993            sc000992
+# # - 1o3_(0.2,0.25)  sc000996
+# # - 1o5_(0.2,0.25)  sc001002
+# 
+# df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
+#                    STKN=="STK2" & FHIST=="fhigh") %>% 
+#   select(OMnam, ADVT, HCRT, UC, value) %>% 
+#   filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) %>% 
+#   spread(ADVT, value)
+# #        OMnam HCRT         UC        int       iny       fpa
+# # 1 STK2_fhigh  1o2  (0.2,0.2) 0.45174894 1.0282512 1.0639618
+# # 2 STK2_fhigh  1o2 (0.2,0.25) 0.03843695 0.9628941 0.2438019
+# # 3 STK2_fhigh  1o3 (0.2,0.25) 0.06919253 1.2284903 1.0788156
+# # 4 STK2_fhigh  1o5 (0.2,0.25) 0.47273023 1.2668448 1.2825625
+# # 5 STK2_fhigh  2o3  (0.2,0.2) 0.06077578 1.2334014 1.2500266
+# # 6 STK2_fhigh  2o3 (0.2,0.25) 0.01455146 0.2785906 0.2626940
+# 
+# 
+# df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
+#                    STKN=="STK2" & FHIST=="fhigh" & value <0.5) %>% 
+#   select(SCENARIO, OMnam, ADVT, HCRT, UC, indicator, value)
+# 
+# 
+# # - rules with risks > 0.85
+# 
+# df_bc %>% filter(indicator == "Risk3.Blim" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
+#                    STKN=="STK2" & FHIST=="fhigh" & value > 0.85) %>% 
+#   select(SCENARIO, OMnam, ADVT, HCRT, UC, indicator, value)
+# 
+# # Selection:             int       iny       fpa
+# # - 2o3_(0.2,0.2)   sc000987
+# # - 2o3_(0.2,0.25)  sc000999  sc000997  sc000998
+# # - 1o2_(0.2,0.2)   sc000981
+# # - 1o2_(0.2,0.25)  sc000993            sc000992
+# # - 1o3_(0.2,0.25)  sc000996
+# # - 1o5_(0.2,0.25)  sc001002
+# 
+# 
+# df_bc %>% filter(indicator == "Risk3.Blim" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
+#                    STKN=="STK2" & FHIST=="fhigh") %>% 
+#   select(OMnam, ADVT, HCRT, UC, value) %>% 
+#   filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) %>% 
+#   spread(ADVT, value)
+# #        OMnam HCRT         UC   int   iny   fpa
+# # 1 STK2_fhigh  1o2  (0.2,0.2) 0.935 0.079 0.498
+# # 2 STK2_fhigh  1o2 (0.2,0.25) 0.999 0.686 0.991
+# # 3 STK2_fhigh  1o3 (0.2,0.25) 1.000 0.264 0.609
+# # 4 STK2_fhigh  1o5 (0.2,0.25) 0.922 0.144 0.126
+# # 5 STK2_fhigh  2o3  (0.2,0.2) 0.997 0.204 0.226
+# # 6 STK2_fhigh  2o3 (0.2,0.25) 1.000 0.991 0.994
+# 
+# 
+# aux <- df_bc %>% filter(indicator %in% c("catch.MSY","Risk3.Blim") & ADVT!="fix" & BSAFE=="none" & term=="long" & 
+#                    STKN=="STK2" & FHIST=="fhigh") %>% 
+#   select(OMnam, ADVT, HCRT, UC, indicator, value) %>% 
+#   filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) %>% 
+#   spread(ADVT, value)
+# 
+# aux_ryield <- aux %>% filter(indicator == "catch.MSY") %>% select(-indicator)
+# names(aux_ryield)[-c(1:3)] <- paste( names(aux_ryield)[-c(1:3)], "ryield", sep = "_")
+# 
+# aux_risk   <- aux %>% filter(indicator == "Risk3.Blim") %>% select(-indicator)
+# names(aux_risk)[-c(1:3)] <- paste( names(aux_risk)[-c(1:3)], "risk", sep = "_")
+# 
+# bind_cols(aux_ryield, aux_risk[,-c(1:3)])
+# #        OMnam HCRT         UC int_ryield iny_ryield fpa_ryield int_risk iny_risk fpa_risk
+# # 1 STK2_fhigh  1o2  (0.2,0.2) 0.45174894  1.0282512  1.0639618    0.935    0.079    0.498
+# # 2 STK2_fhigh  1o2 (0.2,0.25) 0.03843695  0.9628941  0.2438019    0.999    0.686    0.991
+# # 3 STK2_fhigh  1o3 (0.2,0.25) 0.06919253  1.2284903  1.0788156    1.000    0.264    0.609
+# # 4 STK2_fhigh  1o5 (0.2,0.25) 0.47273023  1.2668448  1.2825625    0.922    0.144    0.126
+# # 5 STK2_fhigh  2o3  (0.2,0.2) 0.06077578  1.2334014  1.2500266    0.997    0.204    0.226
+# # 6 STK2_fhigh  2o3 (0.2,0.25) 0.01455146  0.2785906  0.2626940    1.000    0.991    0.994
+# 
+# 
+# # RULES TO BE ANALYSED for OM: STK2_fhigh
+# # Selection:             int       iny       fpa
+# # - 2o3_(0.2,0.2)   sc000987
+# # - 2o3_(0.2,0.25)  sc000999  sc000997  sc000998
+# # - 1o2_(0.2,0.2)   sc000981
+# # - 1o2_(0.2,0.25)  sc000993            sc000992
+# # - 1o3_(0.2,0.25)  sc000996
+# # - 1o5_(0.2,0.25)  sc001002
+# 
+# 
+# # RULES TO BE ANALYSED for OM: STK2_fhigh
+# 
+# prl <- df_bc %>% filter(indicator == "catch.MSY" & ADVT!="fix" & BSAFE=="none" & term=="long" & 
+#                    STKN=="STK2" & FHIST=="fhigh") %>% 
+#   select(HCRT, UC, ADVT, SCENARIO) %>% 
+#   filter( (HCRT=="2o3" & UC=="(0.2,0.2)") | (HCRT=="2o3" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o2" & UC=="(0.2,0.2)") | (HCRT=="1o2" & UC=="(0.2,0.25)") | 
+#             (HCRT=="1o3" & UC=="(0.2,0.25)") | (HCRT=="1o5" & UC=="(0.2,0.25)") ) 
+# 
+# prl %>% spread(ADVT, SCENARIO)
+# 
+# #   HCRT         UC      int      iny      fpa
+# # 1  1o2  (0.2,0.2) sc000981 sc000979 sc000980
+# # 2  1o2 (0.2,0.25) sc000993 sc000991 sc000992
+# # 3  1o3 (0.2,0.25) sc000996 sc000994 sc000995
+# # 4  1o5 (0.2,0.25) sc001002 sc001000 sc001001
+# # 5  2o3  (0.2,0.2) sc000987 sc000985 sc000986
+# # 6  2o3 (0.2,0.25) sc000999 sc000997 sc000998
+# 
+# rules <- prl$SCENARIO 
+# 
+# # problematic rules
+# 
+# jpeg(file.path(plot.dir,"ryield_vs_risk_STK2fhigh_problems.jpeg",sep=""), quality=100, width=1400, height=700)
+# 
+#   aux <- df_bc %>% filter(ADVT!= "fix" & BSAFE == "none" & indicator %in% perfnms & SCENARIO %in% rules)
+#   
+#   p <- ggplot(aux, aes(x=ADVT, y=value, group=interaction(HCRT,BSAFE,PBUF,UC,HCRI), col=HCRT, lty=UC))+
+#     geom_line()+
+#     geom_hline(aes(yintercept = 0.05), data = subset(aux, indicator == "Risk3.Blim"), linetype="dashed") +
+#     facet_grid(indicator ~ OMnam + term, scales="free")+
+#     scale_colour_manual(values = rule.col)+
+#     ylab("")+
+#     theme(text = element_text(size = 20), 
+#           title = element_text(size = 16, face = "bold"), 
+#           strip.text = element_text(size = 20))
+#   print(p)
+# 
+# dev.off()
 
 
 

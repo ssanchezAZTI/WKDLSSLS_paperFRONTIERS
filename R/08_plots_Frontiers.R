@@ -17,6 +17,8 @@
 
 rm(list=ls())
 
+set.seed(2159)
+
 #==============================================================================
 # WORKING DIRECTORY                                                        ----
 #==============================================================================
@@ -25,7 +27,8 @@ rm(list=ls())
 inp.dir <- "./input"
 
 # directory with results
-res.dir <- "./output"
+res.dir   <- "./output"
+ressc.dir <- file.path(res.dir,"output_scenarios")
 
 # directory with plots
 plot.dir <- "./plots/FRONTIERS"
@@ -333,7 +336,9 @@ ucp.col3 <- c("red",          # (0.2,0.2)
 # aux <- df_om %>% filter(term == "short" & HCRT == "1o2" & UC == "(NA,NA)" %>% 
 #   select(IAVhist, STKN, LHSC, SIGR, FHIST)
   
-aux <- read.csv(file.path("input","list_oms_IAV_Depletion_TAC.csv")) %>% 
+dhist <- read.csv(file.path("input","list_oms_IAV_Depletion_TAC.csv"))
+
+aux <- dhist %>% 
     mutate(IAVhist = IAV, 
            FHIST = factor(FHIST, levels=c("f0","flow","fopt","fhigh")),
            LHSC = factor(LHSC, levels=c("lowprod","bc","highprod")),
@@ -366,11 +371,13 @@ jpeg(file.path(plot.dir,"fig02b_IAVhist_SIGR0.jpeg"), quality=100, width=900, he
 
 dev.off()
 
-iavhist <- aux %>% filter(SIGR == 0 & FHIST != "f0") %>% 
+# - historical IAV
+
+iavhist_sr0 <- aux %>% filter(SIGR == 0 & FHIST != "f0") %>% 
   mutate(IAVhist = round(IAVhist, 4)) %>%
   unique() %>% 
   spread(LHSC, IAVhist) %>% mutate
-iavhist
+iavhist_sr0
 #   STKN SIGR FHIST lowprod     bc highprod
 # 1 STK1    0  flow  0.0301 0.0339   0.0347
 # 2 STK1    0  fopt  0.0523 0.0514   0.0490
@@ -388,10 +395,40 @@ aux %>% filter(SIGR == 0.75) %>%
 #  <chr>   <dbl>   <dbl>
 # 1 STK1    0.374   0.844
 # 2 STK2    0.180   0.420
+
+dhist %>% filter(LHSC == "bc" & SIGR == 0.75 & FHIST != "f0" & CVID == "low") %>%
+  mutate(IAV = round(IAV,2), 
+         FHIST = factor(FHIST, levels=c("flow","fopt","fhigh"))) %>%
+  select(STKN, LHSC, FHIST, IAV) %>% 
+  spread(FHIST, IAV)
+#   STKN LHSC flow fopt fhigh
+# 1 STK1   bc 0.54 0.65  0.77
+# 2 STK2   bc 0.24 0.30  0.38
+
+iavproj <- df_bc %>% filter(indicator == "IAV" & ADVT == "iny" & BSAFE == "none") %>% 
+  select(OMnam, term, HCR, UC, value) 
+
+iavproj %>% spread(term, value)
+
+iavproj %>% 
+  group_by(OMnam, term) %>% 
+  summarise(IAV.min = min(value), IAV.mean = mean(value), IAV.med = median(value), IAV.max = max(value))
+
+iavproj %>% filter(term == "short") %>% 
+  group_by(OMnam) %>% 
+  summarise(IAV.min = min(value), IAV.mean = mean(value), IAV.med = median(value), IAV.max = max(value))
+#   OMnam      IAV.min IAV.mean IAV.med IAV.max
+#   <fct>        <dbl>    <dbl>   <dbl>   <dbl>
+# 1 STK1_flow    0.505    0.554   0.552   0.627
+# 2 STK1_fopt    0.590    0.651   0.663   0.722
+# 3 STK1_fhigh   0.625    0.719   0.728   0.784
+# 4 STK2_flow    0.237    0.256   0.249   0.305
+# 5 STK2_fopt    0.295    0.347   0.330   0.455
+# 6 STK2_fhigh   0.398    0.514   0.495   0.690
     
 
 #==============================================================================
-# TRAJECTORIES: 1-over-3 rule witb 20% ucaps
+# TRAJECTORIES: 2-over-3 rule witb 20% ucaps
 #==============================================================================
 
 # - biomass and catch
@@ -407,12 +444,54 @@ refpts <- list()
 for (lh in unique(aux$LHnam))
   refpts[[lh]] <- loadToEnv(file.path(inp.dir,paste0(lh,"_dataLH.RData")))[["ref.pts"]]
 
+
+# all iterations (wide format)
+
+dd.its <- NULL
+
+sc0 <- unique(dat_bio$scenario)[1]
+nit.sample <- 2
+it.sel <- sample( loadToEnv(file.path(ressc.dir,paste0("out_",sc0,".RData")))[[paste(sc0,"bio",sep="_")]] %>% 
+                    .$iter %>% unique(), nit.sample)
+#   6 466
+
+for (sc in unique(aux$scenario)) {
+
+  # specific scenario
+
+  sc.its <- loadToEnv(file.path(ressc.dir,paste0("out_",sc,".RData")))[[paste(sc,"bio",sep="_")]]
+
+  # specific iteration
+
+  sc.its <- sc.its %>% filter(iter %in% it.sel) %>%
+    select(scenario,stock,year,iter,one_of(c("ssb","catch"))) %>%
+    mutate(iter = as.factor(iter))
+
+  dd.its <- rbind(dd.its, sc.its)
+  
+  rm(sc.its)
+
+}
+
+# add information on scenario
+
+dd.its <- dd.its %>% rename(SCENARIO = scenario) %>%
+  left_join(sc.dat, by="SCENARIO") %>% select( names(sc.dat), names(dd.its[-1])) %>%
+  mutate(FHIST = factor(FHIST, levels=c("flow","fopt","fhigh")))
+
+# reshape to the long format for ggplot
+
+aux2 <- reshape( dd.its, direction="long", varying=names(dd.its)[-c(1:20)], v.names=c("value"),
+                 idvar=names(dd.its)[c(1:20)], timevar="indicator", times=names(dd.its)[-c(1:20)]) %>% 
+  mutate(fhist = factor(FHIST, levels=c("flow","fopt","fhigh")))
+
 jpeg(file.path(plot.dir,"fig04_trajectories_2o3_ucp20.jpeg"), quality=100, width=900, height=700)
 
   p <- ggplot(data = aux %>% filter(indicator %in% c("ssb","catch")), aes(x = year, y = q50)) + 
     geom_line() + 
-    geom_ribbon(aes(x = year, ymin = q05, ymax = q95), alpha = 0.5) + 
-    facet_grid(FHIST ~ STKN + indicator, scales = "free") + 
+    geom_ribbon(aes(x = year, ymin = q05, ymax = q95), alpha = 0.35) + 
+    geom_line(data=aux2, aes(year, y=value, group=iter, col=iter))+
+    facet_grid(FHIST ~ STKN + indicator) + 
     expand_limits(y=0) +
     geom_vline(xintercept = proj.yr - 0.5, linetype = "longdash") +
     geom_hline(lty = 2, data = data.frame(STKN = rep(unique(aux$STKN),each=3), 
@@ -423,13 +502,44 @@ jpeg(file.path(plot.dir,"fig04_trajectories_2o3_ucp20.jpeg"), quality=100, width
     theme_bw() + 
     theme(text = element_text(size = 20), 
           title = element_text(size = 16, face = "bold"), 
-          strip.text = element_text(size = 20)) + 
+          strip.text = element_text(size = 20),
+          legend.position = "none") + 
     ylab("") + 
     theme(plot.title = element_text(hjust = 0.5))
   print(p)
 
 dev.off()
 
+
+# risks 2o3 rule with 20% UC
+
+risks0 <- df_bc %>% filter(LHSC == "bc" & SIGR == 0.75 & CVID == "low" & 
+                             HCRT=="2o3" & UCPL==0.2 & UCPU==0.2 & BSAFE=="none" & 
+                             ADVT == "iny" & indicator == "Risk3.Blim") %>% 
+  rename(Risk3.Blim = value) %>% 
+  select(OMnam, STKN, FHIST, ADVT, term, Risk3.Blim) 
+
+risks0 %>% filter(term != "mid") %>% 
+  select(OMnam, term, Risk3.Blim) %>% 
+  spread(key = term, value = Risk3.Blim)
+#        OMnam short  long
+# 1  STK1_flow 0.164 0.094
+# 2  STK1_fopt 0.344 0.197
+# 3 STK1_fhigh 0.461 0.268
+# 4  STK2_flow 0.007 0.017
+# 5  STK2_fopt 0.121 0.190
+# 6 STK2_fhigh 0.438 0.520
+
+risks0 %>% group_by(STKN, ADVT, term) %>% 
+  summarise(risk.min = min(Risk3.Blim), risk.max = max(Risk3.Blim))
+#   STKN  ADVT  term  risk.min risk.max
+#  <chr> <ord> <fct>    <dbl>    <dbl>
+# 1 STK1  iny   short    0.164    0.461
+# 2 STK1  iny   mid      0.169    0.472
+# 3 STK1  iny   long     0.094    0.268
+# 4 STK2  iny   short    0.007    0.438
+# 5 STK2  iny   mid      0.012    0.469
+# 6 STK2  iny   long     0.017    0.52 
 
 # risks by OM
 
@@ -620,7 +730,7 @@ mean(chist[,30,]) / msy # 1.020372
     p <- ggplot(aux, aes(x=ADVT, y=value, group=interaction(HCRT,BSAFE,PBUF,UC,HCRI), col=UC, lty=HCRT))+
       geom_line()+
       geom_hline(aes(yintercept = 0.05), data = subset(aux, indicator == "Risk3.Blim"), linetype="dashed") +
-      facet_grid(indicator + term ~ OMnam, scales="free")+
+      facet_grid(indicator + term ~ OMnam)+ #, scales="free"
       scale_colour_manual(values = ucp.col)+
       ylab("")+
       theme(text = element_text(size = 20), 
@@ -648,6 +758,147 @@ mean(chist[,30,]) / msy # 1.020372
     print(p)
   
   dev.off()
+  
+  
+  #----------------------------------------------
+  # Comparing numeric values
+  #----------------------------------------------
+  
+  # RISK
+  
+  # calendar checks
+  caldf <- df_bc %>% filter(indicator=="Risk3.Blim" & term != "mid" & HCRT != "ft0" & BSAFE == "none") %>% 
+    select(term, OMnam, STKN, FHIST, UC, ADVT, HCRT, value) %>% 
+    tidyr::spread("ADVT", "value") %>% 
+    mutate(iny_int = iny - int, 
+           fpa_int = fpa - int, 
+           fpa_iny = fpa - iny)
+  
+  # - differences contrary to expected (hisgher risks)
+  caldf %>% filter(iny_int >=0.01 & term == "short")
+  caldf %>% filter(fpa_int >=0.01 & term == "short")
+  caldf %>% filter(fpa_iny >=0.01 & term == "short")
+  caldf %>% filter(iny_int >=0.01 & term == "long")
+  caldf %>% filter(fpa_int >=0.01 & term == "long")
+  caldf %>% filter(fpa_iny >=0.01 & term == "long")
+  
+  caldf %>% group_by(term, OMnam, FHIST) %>% 
+    summarise(iny_int = max(iny_int), fpa_int = max(fpa_int), fpa_iny = max(fpa_iny))
+  
+  caldf %>% filter(iny_int >=0.01 & term == "short" & (int <= 0.05 | iny <= 0.05 | fpa <= 0.05))
+  caldf %>% filter(fpa_int >=0.01 & term == "short" & (int <= 0.05 | iny <= 0.05 | fpa <= 0.05))
+  caldf %>% filter(fpa_iny >=0.01 & term == "short" & (int <= 0.05 | iny <= 0.05 | fpa <= 0.05))
+  #    term     OMnam STKN FHIST         UC HCRT   int   iny   fpa iny_int fpa_int fpa_iny
+  # 1 short STK2_fopt STK2  fopt (0.8,2.75)  1o2 0.211 0.045 0.059  -0.166  -0.152   0.014
+  # 2 short STK2_fopt STK2  fopt    (0.8,4)  1o2 0.215 0.045 0.060  -0.170  -0.155   0.015
+  # 3 short STK2_fopt STK2  fopt (0.8,5.25)  1o2 0.215 0.045 0.060  -0.170  -0.155   0.015
+  # 4 short STK2_fopt STK2  fopt    (NA,NA)  1o2 0.213 0.045 0.060  -0.168  -0.153   0.015
+  caldf %>% filter(iny_int >=0.01 & term == "long" & (int <= 0.05 | iny <= 0.05 | fpa <= 0.05))
+  caldf %>% filter(fpa_int >=0.01 & term == "long" & (int <= 0.05 | iny <= 0.05 | fpa <= 0.05))
+  caldf %>% filter(fpa_iny >=0.01 & term == "long" & (int <= 0.05 | iny <= 0.05 | fpa <= 0.05))
+  #   term      OMnam STKN FHIST      UC HCRT   int   iny   fpa iny_int fpa_int fpa_iny
+  # 1 long STK1_fhigh STK1 fhigh (NA,NA)  1o2 0.076 0.008 0.037  -0.068  -0.039   0.029
+  # 2 long STK1_fhigh STK1 fhigh (NA,NA)  1o3 0.035 0.005 0.023  -0.030  -0.012   0.018
+  # 3 long STK2_fhigh STK2 fhigh (NA,NA)  1o2 0.112 0.020 0.044  -0.092  -0.068   0.024
+  
+  # - in-year calendar
+  caldf %>% filter(iny_int >=0.01 & term == "short") %>% .$UC %>% unique()
+  caldf %>% filter(iny_int >=0.01 & term == "short") %>% .$HCRT %>% unique()
+  caldf %>% filter(iny_int >=0.01 & term == "short" & HCRT != "2o3")             # STK1_fhigh
+  caldf %>% filter(iny_int >=0.01 & term == "short" & !HCRT %in% c("2o3","1o5")) # STK1_fhigh & never (0.8,0.8)
+  caldf %>% filter(iny_int >=0.01 & term == "long") %>% .$UC %>% unique()        # (0.5,1.5) & (0.5,1)
+  caldf %>% filter(iny_int >=0.01 & term == "long") %>% .$HCRT %>% unique()      # 2o3
+  
+  # - differences by FHIST
+  caldf %>% filter(term == "short") %>% 
+    group_by(FHIST) %>% summarise(iny_int.min = min(iny_int), iny_int.max = max(iny_int), 
+                                  fpa_int.min = min(fpa_int), fpa_int.max = max(fpa_int), 
+                                  fpa_iny.min = min(fpa_iny), fpa_iny.max = max(fpa_iny))
+  #   FHIST iny_int.min iny_int.max fpa_int.min fpa_int.max fpa_iny.min fpa_iny.max
+  #   <fct>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>
+  # 1 flow       -0.13       -0.011      -0.153      -0.011     -0.0600       0.001
+  # 2 fopt       -0.181      -0.003      -0.201      -0.03      -0.096        0.023
+  # 3 fhigh      -0.134       0.074      -0.158       0.002     -0.105        0.017
+  
+  caldf %>% filter(term == "short") %>% 
+    group_by(STKN, FHIST) %>% summarise(iny_int.min = min(iny_int), iny_int.max = max(iny_int))
+  #   STKN  FHIST iny_int.min iny_int.max
+  #   <chr> <fct>       <dbl>       <dbl>
+  # 1 STK1  flow       -0.13      -0.028 
+  # 2 STK1  fopt       -0.074     -0.003 
+  # 3 STK1  fhigh      -0.018      0.074 
+  # 4 STK2  flow       -0.1       -0.011 
+  # 5 STK2  fopt       -0.181     -0.043 
+  # 6 STK2  fhigh      -0.134      0.0250 
+  
+  caldf %>% filter(term == "long") %>% 
+    group_by(FHIST) %>% summarise(iny_int.min = min(iny_int), iny_int.max = max(iny_int), 
+                                  fpa_int.min = min(fpa_int), fpa_int.max = max(fpa_int), 
+                                  fpa_iny.min = min(fpa_iny), fpa_iny.max = max(fpa_iny))
+  #   FHIST iny_int.min iny_int.max fpa_int.min fpa_int.max fpa_iny.min fpa_iny.max
+  #   <fct>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>       <dbl>
+  # 1 flow       -0.273      0.0380      -0.307      -0.001     -0.0960      0.0210
+  # 2 fopt       -0.434      0.0470      -0.469       0.021     -0.171       0.0390
+  # 3 fhigh      -0.429      0.035       -0.476       0.02      -0.208       0.039 
+  
+  
+  # RELATIVE YIELDS
+  
+  # calendar checks
+  caldf <- df_bc %>% filter(indicator=="catch.MSY" & term != "mid" & HCRT != "ft0" & BSAFE == "none") %>%
+    select(term, OMnam, STKN, FHIST, UC, ADVT, HCRT, value) %>%
+    tidyr::spread("ADVT", "value") %>%
+    mutate(iny_int = iny - int,
+           fpa_int = fpa - int,
+           fpa_iny = fpa - iny)
+  
+  # - differences contrary to expected (less relative yields)
+  caldf %>% filter(iny_int <=0.01 & term == "short")
+  caldf %>% filter(fpa_int <=0.01 & term == "short")
+  caldf %>% filter(fpa_iny <=0.01 & term == "short")
+  caldf %>% filter(iny_int <=0.01 & term == "long")
+  caldf %>% filter(fpa_int <=0.01 & term == "long")
+  caldf %>% filter(fpa_iny <=0.01 & term == "long")
+  
+  # - in-year calendar
+  caldf %>% filter(iny_int <=0.01 & term == "short") %>% .$UC %>% unique()
+  caldf %>% filter(iny_int <=0.01 & term == "short") %>% .$HCRT %>% unique()
+  caldf %>% filter(iny_int <=0.01 & term == "short" & HCRT != "2o3")
+  caldf %>% filter(iny_int <=0.01 & term == "short" & !HCRT %in% c("2o3","1o5"))
+  caldf %>% filter(iny_int <=0.01 & term == "long") %>% .$UC %>% unique()
+  caldf %>% filter(iny_int <=0.01 & term == "long") %>% .$HCRT %>% unique()
+  caldf %>% filter(iny_int <=0.01 & term == "long" & HCRT != "2o3")
+  caldf %>% filter(iny_int <=0.01 & term == "long" & !HCRT %in% c("2o3","1o5"))
+  
+  # - differences by FHIST
+  caldf %>% filter(term == "long") %>%
+    group_by(FHIST) %>% summarise(iny_int.min = min(iny_int), iny_int.max = max(iny_int),
+                                  fpa_int.min = min(fpa_int), fpa_int.max = max(fpa_int),
+                                  fpa_iny.min = min(fpa_iny), fpa_iny.max = max(fpa_iny))
+  
+  
+  # RISKs comparison by term
+  
+  risk_short <- df_bc %>% filter(indicator=="Risk3.Blim" & term == "short" & HCRT != "ft0" & BSAFE == "none" & 
+                                   ADVT == "iny") %>% 
+    select(STKN, FHIST, UC, ADVT, HCRT, value) %>% 
+    tidyr::spread(STKN, value) %>% 
+    mutate(diff = STK1-STK2)
+  risk_short
+  risk_mid <- df_bc %>% filter(indicator=="Risk3.Blim" & term == "mid" & HCRT != "ft0" & BSAFE == "none" 
+                               & ADVT == "iny") %>% 
+    select(STKN, FHIST, UC, ADVT, HCRT, value) %>% 
+    tidyr::spread(STKN, value) %>% 
+    mutate(diff = STK1-STK2)
+  risk_mid 
+  risk_long <- df_bc %>% filter(indicator=="Risk3.Blim" & term == "long" & HCRT != "ft0" & BSAFE == "none" 
+                                & ADVT == "iny") %>% 
+    select(STKN, FHIST, UC, ADVT, HCRT, value) %>% 
+    tidyr::spread(STKN, value) %>% 
+    mutate(diff = STK1-STK2)
+  risk_long 
+  
+  
   
   
   # effect of rule and uncertainty caps (in-year advice)
@@ -697,6 +948,16 @@ mean(chist[,30,]) / msy # 1.020372
     
     dev.off()
   }
+  
+  # tabulated results
+  sumres <- df_bc %>% filter(indicator %in% c("Risk3.Blim","catch.MSY","IAV") & HCRT != "ft0" & 
+                                 BSAFE == "none") %>% 
+    mutate(indicator = ordered(indicator, levels=c("Risk3.Blim","catch.MSY","IAV"))) %>% 
+    select(STKN, FHIST, term, ADVT, HCRT, UC, indicator, value) %>% 
+    # mutate(value = round(value,2)) %>% 
+    tidyr::spread(indicator, value)
+  
+  write.csv(sumres, file=file.path(plot.dir,"tabXX_summary_risk&ryield_iav.csv"), row.names=F)
 
 
 #==============================================================================
@@ -779,6 +1040,9 @@ jpeg(file.path(plot.dir,paste("fig06b_trajectories_ryield.jpeg",sep="")), qualit
   print(p)
   
 dev.off()
+
+
+
 
 
 #==============================================================================
@@ -918,7 +1182,7 @@ dev.off()
 # Best rule
 #==============================================================================
 
-aux <- df_bc %>% subset(indicator %in% perfnms & term != "mid" & 
+aux <- df_bc %>% subset(indicator %in% perfnms & 
                 LHSC == "bc" & SIGR == 0.75 & CVID == "low" & ADVT == "iny" & HCRT != "ft0") %>% 
   select(term, STKN, FHIST, OMnam, HCRT, BSAFE, UC, indicator, value) %>% 
   tidyr::spread(indicator, value)
@@ -960,12 +1224,32 @@ jpeg(file.path(plot.dir,paste("fig08_risk_vs_ryield.jpeg",sep="")), quality=100,
 
 dev.off()
 
+
+dd <- aux %>% filter( BSAFE == "none" & term != "mid" & #term == "long" & 
+                        !UC %in% c("(0.2,0.2)", "(0.2,0.25)", "(0.5,1)", "(0.5,1.5)") )
+
+jpeg(file.path(plot.dir,paste("fig08b_risk_vs_ryield.jpeg",sep="")), quality=100, width=1400, height=700)
+
+  p <- ggplot(dd, aes(x=catch.MSY, y=Risk3.Blim, shape=HCRT, colour=UC))+
+    geom_point(size=3)+
+    geom_hline(yintercept = 0.05, linetype = "longdash")+
+    facet_grid(term ~ OMnam, scales = "free_y")+
+    scale_colour_manual(values = ucp.col2)+
+    theme(text = element_text(size = 20), 
+          title = element_text(size = 16, face = "bold"), 
+          strip.text = element_text(size = 20))
+  
+  print(p)
+
+dev.off()
+
+
 # without 2o3 
 
 dd <- aux %>% filter( HCRT != "2o3" & BSAFE == "none" & #term == "long" & 
                         !UC %in% c("(0.2,0.2)", "(0.2,0.25)", "(0.5,1)", "(0.5,1.5)") )
 
-jpeg(file.path(plot.dir,paste("fig08b_risk_vs_ryield.jpeg",sep="")), quality=100, width=1400, height=700)
+jpeg(file.path(plot.dir,paste("fig08c_risk_vs_ryield.jpeg",sep="")), quality=100, width=1400, height=700)
 
   p <- ggplot(dd, aes(x=catch.MSY, y=Risk3.Blim, shape=HCRT, colour=UC))+
     geom_point(size=3)+
@@ -1034,7 +1318,24 @@ aux <- df_bc %>% subset(indicator %in% perfnms & LHSC == "bc" & SIGR == 0.75 & C
   
   # 2o3 rule
   
-  jpeg(file.path(plot.dir,paste("fig09b_risk_vs_ryield_2o3bsafe.jpeg",sep="")), quality=100, width=1400, height=700)
+  jpeg(file.path(plot.dir,paste("fig09c_risk_vs_ryield_2o3bsafe.jpeg",sep="")), quality=100, width=1400, height=700)
+  
+    dd <- aux %>% filter(HCRT == "2o3" & term != "mid")
+    
+    p <- ggplot(dd, aes(x=catch.MSY, y=Risk3.Blim, shape=HCR, colour=UC))+
+      geom_point(size=3)+
+      geom_hline(yintercept = 0.05, linetype = "longdash")+
+      facet_grid(term ~ OMnam, scales = "free_y")+
+      scale_colour_manual(values = ucp.col3)+
+      theme(text = element_text(size = 20), 
+            title = element_text(size = 16, face = "bold"), 
+            strip.text = element_text(size = 20))
+    
+    print(p)
+  
+  dev.off()
+  
+  jpeg(file.path(plot.dir,paste("fig09d_risk_vs_ryield_2o3bsafe.jpeg",sep="")), quality=100, width=1400, height=700)
   
     dd <- aux %>% filter(HCRT == "2o3")
     
@@ -1101,4 +1402,29 @@ jpeg(file.path(plot.dir,paste("figXX_riskPERtonne.jpeg",sep="")), quality=100, w
 
 dev.off()
 
+aux <- df_bc %>% subset(indicator %in% c("Risk3.Blim","catch") & term != "mid" & 
+                          LHSC == "bc" & SIGR == 0.75 & CVID == "low" & ADVT == "iny" &
+                          HCR %in% c("1o2","1o2_Inorm") & 
+                          UC %in% (df_bc %>% subset(HCR %in% c("1o2_Inorm")) %>% .$UC %>% unique())) %>% 
+                          #!UCPL %in% c(0.2,0.5)
+  select(term, STKN, FHIST, OMnam, HCR, UC, indicator, value) %>% 
+  tidyr::spread(indicator, value) %>% 
+  mutate(ratio = Risk3.Blim/catch)
+
+jpeg(file.path(plot.dir,paste("figXX_riskPERtonne_selection.jpeg",sep="")), quality=100, width=1400, height=700)
+
+  p <- ggplot(aux, aes(x=UC, y=ratio, shape=HCR, colour=UC))+
+    geom_point(size=3)+
+    facet_grid(term ~ OMnam, scales = "free")+
+    ylab("Risk per tonne")+
+    scale_colour_manual(values = ucp.col)+
+    theme(axis.text.x=element_blank(), 
+          text = element_text(size = 20), 
+          title = element_text(size = 16, face = "bold"), 
+          strip.text = element_text(size = 20))
   
+  print(p)
+
+dev.off()
+
+
