@@ -44,6 +44,7 @@ library(R.utils)
 library(plyr)
 library(tidyr)
 library(dplyr)
+library(R.utils)
 
 theme_set(theme_bw())
 
@@ -504,7 +505,7 @@ jpeg(file.path(plot.dir,"fig04_trajectories_2o3_ucp20.jpeg"), quality=100, width
           title = element_text(size = 16, face = "bold"), 
           strip.text = element_text(size = 20),
           legend.position = "none") + 
-    ylab("") + 
+    ylab("tonnes") + 
     theme(plot.title = element_text(hjust = 0.5))
   print(p)
 
@@ -1426,5 +1427,76 @@ jpeg(file.path(plot.dir,paste("figXX_riskPERtonne_selection.jpeg",sep="")), qual
   print(p)
 
 dev.off()
+
+
+#==============================================================================
+# SURVIVAL RATES                                                           ----
+#==============================================================================
+
+# natural mortality-at-age
+
+mage <- data.frame()
+
+for (stk in unique(df_om$STKN)) for (p in unique(df_om$LHSC)) {
+  
+  dat <- loadToEnv(file.path(inp.dir,paste0(stk,p,"_dataLH.RData")))[["stk"]]
+  
+  mage <- rbind( mage, 
+                 data.frame( STKN=stk, LHSC=p, age=dimnames(dat)$age, 
+                             value=iterMeans(seasonSums(dat@m))[,1,drop=TRUE]))
+  
+}
+
+mage %>% spread(age, value)
+
+mage %>% group_by(STKN, LHSC) %>% 
+  summarise(meanmort=mean(value)) %>% 
+  mutate(survp = exp(-meanmort))
+
+#   STKN  LHSC     meanmort survp
+#   <chr> <chr>       <dbl> <dbl>
+# 1 STK1  bc          1.14  0.321
+# 2 STK1  highprod    1.14  0.321
+# 3 STK1  lowprod     1.14  0.321
+# 4 STK2  bc          0.502 0.605
+# 5 STK2  highprod    0.502 0.605
+# 6 STK2  lowprod     0.502 0.605
+
+
+mage <- mage %>% spread(age, value)
+
+mage
+
+
+
+
+
+# survival
+
+survr <- data.frame()
+
+for (stk in unique(df_om$STKN)) for (p in unique(df_om$LHSC)) {
+  
+  dat <- loadToEnv(file.path(inp.dir,paste0(stk,p,"_dataLH.RData")))[["stk"]]
+  
+  survr <- rbind( survr, 
+                  data.frame( STKN=stk, LHSC=p, 
+                              surv1plus=exp(-quantMeans(iterMeans(seasonSums(dat@m))[-1,1,])[drop=TRUE]), 
+                              surv1_2=exp(-quantMeans(iterMeans(seasonSums(dat@m))[2:3,1,])[drop=TRUE]),
+                              surv1_3=exp(-quantMeans(iterMeans(seasonSums(dat@m))[2:4,1,])[drop=TRUE]),
+                              surv4plus=exp(-quantMeans(iterMeans(seasonSums(dat@m))[-c(1:4),1,])[drop=TRUE])
+                              ))
+  
+}
+
+survr
+
+#   STKN     LHSC surv1plus   surv1_2   surv1_3 surv4plus
+# 1 STK1       bc 0.3381835 0.2670018 0.2963147 0.3859683
+# 2 STK1  lowprod 0.3381835 0.2670018 0.2963147 0.3859683
+# 3 STK1 highprod 0.3381835 0.2670018 0.2963147 0.3859683
+# 4 STK2       bc 0.6045445 0.5393449 0.5647117 0.6471870
+# 5 STK2  lowprod 0.6045445 0.5393449 0.5647117 0.6471870
+# 6 STK2 highprod 0.6045445 0.5393449 0.5647117 0.6471870
 
 
