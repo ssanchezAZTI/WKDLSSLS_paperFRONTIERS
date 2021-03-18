@@ -1,15 +1,6 @@
-# ----------------------------------
-# ui file
-# ANICHO 
-# February 2021 
-# -----------------------------------
-
-# Load data ---------------------------------------------------------------
-
-perf.dat <- read.csv(file.path("data/perfstats_BC.csv"), header=T, sep=";")
-sc.dat <- read.csv(file.path("data/list_scenarios.csv"), header=T, sep=",")
-
-# UI code -----------------------------------------------------------------
+#==============================================================================
+# UI code (general)                                                        ----
+#==============================================================================
 
 shinyUI(navbarPage(
   
@@ -57,15 +48,15 @@ shinyUI(navbarPage(
   # Following Tab panels 
   # --------------
   
-  tabPanel(title = "TAB 1", 
-           value = "tab1",
-           tab1panel(),
-  ), # close tab 1
+  tabPanel(title = "Figure 3", 
+           value = "fig03",
+           fig03panel(),
+  ), # close Figure 3
   
-  tabPanel(title = "TAB 2", 
-           value = "tab2",
-           tab2panel(),
-  ), # close tab 2
+  tabPanel(title = "Figure 3b",
+           value = "fig03b",
+           fig03bpanel(),
+  ), # close Figure 3b
   
   tabPanel(title = "ABOUT", 
            value = "about"
