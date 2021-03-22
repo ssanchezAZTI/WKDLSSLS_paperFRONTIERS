@@ -1,4 +1,56 @@
 #==============================================================================
+# Figure 2                                                                 ----
+#==============================================================================
+
+fig02panel <- function() {
+  
+  fluidPage(
+    titlePanel("Historical interannual variation (IAV)"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("stkn02", "Stock type:",
+                           choiceNames = STKNnms_hist, choiceValues = STKNnms_hist,
+                           selected = STKNnms_hist,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("lhsc02", "Productivity:",
+                           choiceNames = LHSCnms_hist, choiceValues = LHSCnms_hist,
+                           selected = LHSCnms_hist,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("sigr02", "Recruitment variability:",
+                           choiceNames = SIGRnms_hist, choiceValues = SIGRnms_hist,
+                           selected = SIGRnms_hist,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist02", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms_hist), FHISTnms_hist),
+                           selected = FHISTnms_hist, 
+                           inline = TRUE
+        ),
+        h4("Figure settings"), 
+        selectInput("idpos02",
+                    label = "Select variable in x-axis and fhist positions:",
+                    choices = c("SIGR","FHIST"),
+                    selected = "SIGR",
+                    multiple = FALSE
+        ), 
+        width = 3
+      ),
+      mainPanel(
+        plotOutput("plot02", height = "575px"),
+        uiOutput("text02"),
+        width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+}
+
+
+
+#==============================================================================
 # Figure 3                                                                 ----
 #==============================================================================
 

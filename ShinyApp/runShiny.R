@@ -34,9 +34,17 @@ library(dplyr)
 # Global variables
 
 load(file.path("data","plotinputs.RData"))
-# dat_bio, dat_bioQ, df_bc, df_cvid, df_om, ucp.col, ucp.col2, ucp.col3, perfnms, perflabels
+# dhist, dat_bio, dat_bioQ, df_bc, df_cvid, df_om, ucp.col, ucp.col2, ucp.col3, perfnms, perflabels
 
 plabs <- setNames(perflabels, perfnms)
+
+
+# - Historical part
+
+STKNnms_hist  <- unique(dhist$STKN)
+LHSCnms_hist  <- levels(dhist$LHSC)
+SIGRnms_hist  <- levels(dhist$SIGR)
+FHISTnms_hist <- levels(dhist$FHIST)
 
 
 # - Base Case

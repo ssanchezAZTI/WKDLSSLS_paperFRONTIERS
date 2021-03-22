@@ -14,11 +14,11 @@ shinyUI(navbarPage(
    # collapsible = TRUE,
   fluid = TRUE,
   inverse = TRUE,
-  windowTitle= tags$head(
-    tags$link(rel = "icon", type = "image/png", href = "logos/ANICHO_minilogo.png"),
-    tags$title("ANICHO")
-  ),
-  # windowTitle = "AZTI VAPEM",
+  # windowTitle= tags$head(
+  #   tags$link(rel = "icon", type = "image/png", href = "logos/ANICHO_minilogo.png"),
+  #   tags$title("Adapting simple index-based catch rules for data-limited stocks to short-lived fish stocks’ characteristics")
+  # ),
+  windowTitle = "AZTI VAPEM",
   position = "fixed-top",
   #footer = includeHTML("./www/footer.html"), # twitter, disclaimer etc.
   header = tags$style(
@@ -40,13 +40,18 @@ shinyUI(navbarPage(
     fluidRow( 
       br(), br(),
       align = "center",
-      p("Lo que se quiera incluir en este layout.")
+      p("Interactive version of the figures in the above publication.")
     ) # to customize as desire
   ), # close home
   
   # --------------
   # Following Tab panels 
   # --------------
+  
+  tabPanel(title = "Figure 2", 
+           value = "fig02",
+           fig02panel(),
+  ), # close Figure 2
   
   tabPanel(title = "Figure 3", 
            value = "fig03",
@@ -88,7 +93,7 @@ shinyUI(navbarPage(
            fig13panel(),
   ), # close Figure 13
   
-  tabPanel(title = "ABOUT", 
+  tabPanel(title = "ABOUT",
            value = "about"
   ) # close about
   
