@@ -62,7 +62,7 @@ output$text03 <- renderUI({
           figvar03,
           "by calendar type (ADVT, x-axis) and alternative operating models", ompos03,
           "The harvest control rules (HCRT) are represented by line types and uncertainty caps limits (UC)
-          by line colours. See Sanchez et al. (2021) Table 1 for definitions of abbreviations.
+          by line colours. See Table 1 in Sanchez et al. (2021) for definitions of abbreviations.
           The horizontal black dashed line represents the 0.05 biological risk.")
   
 })
