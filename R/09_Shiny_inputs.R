@@ -46,6 +46,20 @@ library(dplyr)
 
 
 #==============================================================================
+# HISTORICAL DATA - iav
+#==============================================================================
+
+dhist <- read.csv(file.path("input","list_oms_IAV_Depletion_TAC.csv"))
+
+dhist <- dhist %>% 
+  mutate(IAVhist = IAV, 
+         FHIST = factor(FHIST, levels=c("f0","flow","fopt","fhigh")),
+         LHSC = factor(LHSC, levels=c("lowprod","bc","highprod")),
+         SIGR = factor(SIGR)) %>% 
+  select(STKN, LHSC, SIGR, FHIST, IAVhist)
+
+
+#==============================================================================
 # SIMULATION DATA - quantiles
 #==============================================================================
 
@@ -340,7 +354,7 @@ perflabels <- c("Risk3.Blim","catch/MSY")
 # SAVE objects                                                             ----
 #==============================================================================
 
-save( dat_bio, dat_bioQ, df_bc, df_cvid, df_om, 
+save( dhist, dat_bio, dat_bioQ, df_bc, df_cvid, df_om, 
       ucp.col, ucp.col2, ucp.col3, perfnms, perflabels,
       file = file.path(shiny.dir,"plotinputs.RData"))
 
