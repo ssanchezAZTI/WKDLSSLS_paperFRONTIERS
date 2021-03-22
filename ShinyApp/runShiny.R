@@ -47,6 +47,9 @@ TERMnms  <- levels(df_bc$term)
 HCRTnms  <- unique(df_bc$HCRT)
 UCnms    <- unique(df_bc$UC)
 
+TERMdef <- setNames(c("first 5 projection years","next 5 projection years","last 10 projection years"), 
+                    c("short","mid","long"))
+
 
 
 #==============================================================================
