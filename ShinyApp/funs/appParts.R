@@ -116,6 +116,58 @@ fig03panel <- function() {
 
 
 #==============================================================================
+# Figure 5                                                                 ----
+#==============================================================================
+
+fig05panel <- function() {
+  
+  fluidPage(
+    titlePanel("Trajectories"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("stkn05", "Stock type:",
+                           choiceNames = STKNnms, choiceValues = STKNnms,
+                           selected = STKNnms,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist05", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms), FHISTnms),
+                           selected = FHISTnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("hcrt05", "Rule (n-over-m):",
+                           choices = setNames(as.list(HCRTnms), HCRTnms),
+                           selected = HCRTnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("uc05", "Uncertainty cap (low,up):",
+                           choices = setNames(as.list(UCnms), UCnms),
+                           selected = UCnms, 
+                           inline = TRUE
+        ),
+        # h4("Figure settings"), 
+        # selectInput("idpos05",
+        #             label = "Select STKN and fhist positions:",
+        #             choices = c("STKN_FHIST in rows","STKN_FHIST in cols",
+        #                         "STKN in cols & FHIST in rows", "STKN in rows & FHIST in cols"),
+        #             selected = "STKN_FHIST in rows",
+        #             multiple = FALSE
+        # ), 
+        width = 3
+      ),
+      mainPanel( # "main panel",
+        plotOutput("plot05", height = "575px"),
+        uiOutput("text05"),width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+}
+
+
+
+#==============================================================================
 # Figure 6                                                                 ----
 #==============================================================================
 
@@ -172,6 +224,58 @@ fig06panel <- function() {
 
 
  
+#==============================================================================
+# Figure 7                                                                 ----
+#==============================================================================
+
+fig07panel <- function() {
+  
+  fluidPage(
+    titlePanel("Trajectories"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("stkn07", "Stock type:",
+                           choiceNames = STKNnms, choiceValues = STKNnms,
+                           selected = STKNnms,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist07", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms), FHISTnms),
+                           selected = FHISTnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("hcrt07", "Rule (n-over-m):",
+                           choices = setNames(as.list(HCRTnms), HCRTnms),
+                           selected = HCRTnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("uc07", "Uncertainty cap (low,up):",
+                           choices = setNames(as.list(UCnms), UCnms),
+                           selected = UCnms, 
+                           inline = TRUE
+        ),
+        # h4("Figure settings"), 
+        # selectInput("idpos07",
+        #             label = "Select STKN and fhist positions:",
+        #             choices = c("STKN_FHIST in rows","STKN_FHIST in cols",
+        #                         "STKN in cols & FHIST in rows", "STKN in rows & FHIST in cols"),
+        #             selected = "STKN_FHIST in rows",
+        #             multiple = FALSE
+        # ), 
+        width = 3
+      ),
+      mainPanel( # "main panel",
+        plotOutput("plot07", height = "575px"),
+        uiOutput("text07"),width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+}
+
+
+
 #==============================================================================
 # Figure 8                                                                 ----
 #==============================================================================

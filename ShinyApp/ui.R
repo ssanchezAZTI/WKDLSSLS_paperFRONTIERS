@@ -58,10 +58,20 @@ shinyUI(navbarPage(
            fig03panel(),
   ), # close Figure 3
   
+  tabPanel(title = "Figure 5", 
+           value = "fig05",
+           fig05panel(),
+  ), # close Figure 5
+  
   tabPanel(title = "Figure 6", 
            value = "fig06",
            fig06panel(),
   ), # close Figure 6
+  
+  tabPanel(title = "Figure 7", 
+           value = "fig07",
+           fig07panel(),
+  ), # close Figure 7
   
   tabPanel(title = "Figure 8", 
            value = "fig08",
