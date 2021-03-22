@@ -296,3 +296,70 @@ fig10panel <- function() {
     ) # close sidebarLayout
   ) # close fluidpage
 }
+
+
+
+#==============================================================================
+# Figure 11                                                                 ----
+#==============================================================================
+
+fig11panel <- function() {
+
+  fluidPage(
+    titlePanel("IAV in the projection period"),
+
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        selectInput("id11", "Indicator:",
+                    choices = perfnms,
+                    selected = "Risk3.Blim",
+                    multiple = FALSE
+        ),
+        checkboxGroupInput("stkn11", "Stock type:",
+                           choices = setNames(as.list(STKNnms_cvid), STKNnms_cvid),
+                           selected = STKNnms_cvid,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist11", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms_cvid), FHISTnms_cvid),
+                           selected = FHISTnms_cvid,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("term11", "Term:",
+                           choices = setNames(as.list(TERMnms), TERMnms),
+                           selected = c("short","long"), #TERMnms 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("hcrt11", "Rule (n-over-m):",
+                           choices = setNames(as.list(HCRTnms_cvid), HCRTnms_cvid),
+                           selected = HCRTnms_cvid,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("cvid11", "Index CV:",
+                           choices = setNames(as.list(CVIDnms_cvid), CVIDnms_cvid),
+                           selected = CVIDnms_cvid,
+                           inline = TRUE
+        ),
+        h4("Figure settings"),
+        selectInput("idpos11",
+                    label = "Select CVID position:",
+                    choices = c("CVID in cols","CVID in rows"),
+                    selected = "CVID in cols",
+                    multiple = FALSE
+        ),
+        width = 3
+      ),
+      mainPanel( # "main panel",
+        # tableOutput("table11"),
+        # textOutput("txt11"),
+        plotOutput("plot11", height = "575px"),
+        uiOutput("text11"),width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+}
+
+
+
+

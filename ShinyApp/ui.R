@@ -73,6 +73,11 @@ shinyUI(navbarPage(
            fig10panel(),
   ), # close Figure 10
   
+  tabPanel(title = "Figure 11",
+           value = "fig11",
+           fig11panel(),
+  ), # close Figure 11
+  
   tabPanel(title = "ABOUT", 
            value = "about"
   ) # close about

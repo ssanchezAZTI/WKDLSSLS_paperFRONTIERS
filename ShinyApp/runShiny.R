@@ -36,6 +36,8 @@ library(dplyr)
 load(file.path("data","plotinputs.RData"))
 # dat_bio, dat_bioQ, df_bc, df_cvid, df_om, ucp.col, ucp.col2, ucp.col3, perfnms, perflabels
 
+plabs <- setNames(perflabels, perfnms)
+
 
 # - Base Case
 
@@ -67,6 +69,7 @@ FHISTnms_cvid <- levels(df_cvid$FHIST)
 TERMnms_cvid  <- levels(df_cvid$term)
 HCRTnms_cvid  <- unique(df_cvid$HCRT)
 UCnms_cvid    <- unique(df_cvid$UC)
+CVIDnms_cvid  <- levels(df_cvid$CVID)
 
 
 
