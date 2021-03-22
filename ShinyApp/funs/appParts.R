@@ -176,3 +176,123 @@ fig08panel <- function() {
   ) # close fluidpage
 }   
 
+
+
+#==============================================================================
+# Figure 9                                                                 ----
+#==============================================================================
+
+fig09panel <- function() {
+  
+  fluidPage(
+    titlePanel("Risks vs. relative yields"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("stkn09", "Stock type:",
+                           choiceNames = STKNnms, choiceValues = STKNnms,
+                           selected = STKNnms,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist09", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms), FHISTnms),
+                           selected = FHISTnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("term09", "Term:",
+                           choices = setNames(as.list(TERMnms), TERMnms),
+                           selected = c("short","long"), #TERMnms 
+                           inline = TRUE
+        ),
+        selectInput("hcrt09", "Rule (n-over-m):",
+                    choices = setNames(as.list(HCRTnms_bsafe), HCRTnms_bsafe),
+                    selected = "1o2",
+                    multiple = FALSE
+        ),
+        checkboxGroupInput("uc09", "Uncertainty cap (low,up):",
+                           choices = setNames(as.list(UCnms_bsafe), UCnms_bsafe),
+                           selected = UCnms_bsafe, 
+                           inline = TRUE
+        ),
+        h4("Figure settings"), 
+        selectInput("idpos09",
+                    label = "Select STKN and fhist positions:",
+                    choices = c("STKN_FHIST in cols","STKN_FHIST in rows",
+                                "STKN in cols & FHIST in rows", "STKN in rows & FHIST in cols"),
+                    selected = "STKN_FHIST in cols",
+                    multiple = FALSE
+        ), 
+        width = 3
+      ),
+      mainPanel(
+        plotOutput("plot09", height = "575px"),
+        uiOutput("text09"),
+        width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+}
+
+
+
+#==============================================================================
+# Figure 10                                                                 ----
+#==============================================================================
+
+fig10panel <- function() {
+  
+  fluidPage(
+    titlePanel("Sensitivity to index CV"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("id10", "Indicator:",
+                           choiceNames = perflabels, choiceValues = perfnms, 
+                           selected = perfnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("stkn10", "Stock type:",
+                           choiceNames = STKNnms_cvid, choiceValues = STKNnms_cvid,
+                           selected = STKNnms_cvid,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist10", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms_cvid), FHISTnms_cvid),
+                           selected = FHISTnms_cvid, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("term10", "Term:",
+                           choices = setNames(as.list(TERMnms_cvid), TERMnms_cvid),
+                           selected = c("short","long"), #TERMnms_cvid 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("hcrt10", "Rule (n-over-m):",
+                    choices = setNames(as.list(HCRTnms_cvid), HCRTnms_cvid),
+                    selected = HCRTnms_cvid,
+                    inline = TRUE
+        ),
+        checkboxGroupInput("uc10", "Uncertainty cap (low,up):",
+                           choices = setNames(as.list(UCnms_cvid), UCnms_cvid),
+                           selected = UCnms_cvid, 
+                           inline = TRUE
+        ),
+        h4("Figure settings"), 
+        selectInput("idpos10",
+                    label = "Select STKN and fhist positions:",
+                    choices = c("STKN_FHIST in cols","STKN_FHIST in rows",
+                                "STKN in cols & FHIST in rows", "STKN in rows & FHIST in cols"),
+                    selected = "STKN_FHIST in cols",
+                    multiple = FALSE
+        ), 
+        width = 3
+      ),
+      mainPanel(
+        plotOutput("plot10", height = "555px"),
+        uiOutput("text10"),
+        width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+}

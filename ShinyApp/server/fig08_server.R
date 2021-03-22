@@ -39,7 +39,6 @@ output$text08 <- renderUI({
   
   if (input$idpos08 == "STKN_FHIST in cols") {
     cols08 <- "the different operating models (as combination of the stock-type and historical exploitation)"
-    # rows08 <- "the temporal scales: the short-term (first 5 projection years), medium-term (next 5 projection years) and the long-term (last 10 projection years)"
     rows08 <- paste0( "the temporal scales: ", paste(paste0(input$term08, "-term (", TERMdef[input$term08],")"), collapse = ", "))
   } else if (input$idpos08 == "STKN_FHIST in rows") {
     rows08 <- "the different operating models (as combination of the stock-type and historical exploitation)"
