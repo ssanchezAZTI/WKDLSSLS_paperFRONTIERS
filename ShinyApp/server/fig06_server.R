@@ -60,7 +60,7 @@ output$text06 <- renderUI({
     hl06 <- "The horizontal dashed line corresponds to the 0.05 risk."
   } else {
     figvar06 <- "relative yields (catch/MSY) "
-    hl06 <- "The horizontal dashed line corresponds to catch at MSY levels."
+    hl06 <- "The horizontal dashed line corresponds to yield at MSY levels."
   }
   
   if (input$idpos06 == "STKN_FHIST in rows") {

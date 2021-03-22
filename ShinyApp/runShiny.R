@@ -72,6 +72,14 @@ UCnms_cvid    <- unique(df_cvid$UC)
 CVIDnms_cvid  <- levels(df_cvid$CVID)
 
 
+# - Sensitivity to CVID
+
+STKNnms_om  <- unique(df_om$STKN)
+FHISTnms_om <- levels(df_om$FHIST)
+TERMnms_om  <- levels(df_om$term)
+HCRTnms_om  <- unique(df_om$HCRT)
+UCnms_om    <- unique(df_om$UC)
+
 
 #==============================================================================
 # App                                                                      ----

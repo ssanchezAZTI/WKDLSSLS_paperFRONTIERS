@@ -185,7 +185,7 @@ fig08panel <- function() {
 fig09panel <- function() {
   
   fluidPage(
-    titlePanel("Risks vs. relative yields"),
+    titlePanel("Biomass safeguards: risks vs. relative yields"),
     
     sidebarLayout(
       sidebarPanel(
@@ -306,7 +306,7 @@ fig10panel <- function() {
 fig11panel <- function() {
 
   fluidPage(
-    titlePanel("IAV in the projection period"),
+    titlePanel("IAV in the projection period based on CVID"),
 
     sidebarLayout(
       sidebarPanel(
@@ -362,4 +362,114 @@ fig11panel <- function() {
 
 
 
+#==============================================================================
+# Figure 12                                                                 ----
+#==============================================================================
 
+fig12panel <- function() {
+  
+  fluidPage(
+    titlePanel("Sensitivity to recruitment variability (SIGR) and productivity (LHSC) - risks"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("stkn12", "Stock type:",
+                           choiceNames = STKNnms_om, choiceValues = STKNnms_om,
+                           selected = STKNnms_om,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist12", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms_om), FHISTnms_om),
+                           selected = FHISTnms_om, 
+                           inline = TRUE
+        ),
+        selectInput("term12", "Term:",
+                    choices = setNames(as.list(TERMnms_om), TERMnms_om),
+                    selected = "long", 
+                    multiple = FALSE
+        ),
+        checkboxGroupInput("hcrt12", "Rule (n-over-m):",
+                           choices = setNames(as.list(HCRTnms_om), HCRTnms_om),
+                           selected = HCRTnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("uc12", "Uncertainty cap (low,up):",
+                           choices = setNames(as.list(UCnms_om), UCnms_om),
+                           selected = UCnms_om, 
+                           inline = TRUE
+        ),
+        h4("Figure settings"), 
+        selectInput("idpos12",
+                    label = "Select SIGR and LHSC positions:",
+                    choices = c("SIGR in x-axis","LHSC in x-axis"),
+                    selected = "SIGR in x-axis",
+                    multiple = FALSE
+        ), 
+        width = 3
+      ),
+      mainPanel(
+        plotOutput("plot12", height = "575px"),
+        uiOutput("text12"),
+        width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+} 
+
+
+
+#==============================================================================
+# Figure 13                                                                 ----
+#==============================================================================
+
+fig13panel <- function() {
+  
+  fluidPage(
+    titlePanel("Sensitivity to recruitment variability (SIGR) and productivity (LHSC) - relative yields"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("stkn13", "Stock type:",
+                           choiceNames = STKNnms_om, choiceValues = STKNnms_om,
+                           selected = STKNnms_om,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist13", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms_om), FHISTnms_om),
+                           selected = FHISTnms_om, 
+                           inline = TRUE
+        ),
+        selectInput("term13", "Term:",
+                    choices = setNames(as.list(TERMnms_om), TERMnms_om),
+                    selected = "long", 
+                    multiple = FALSE
+        ),
+        checkboxGroupInput("hcrt13", "Rule (n-over-m):",
+                           choices = setNames(as.list(HCRTnms_om), HCRTnms_om),
+                           selected = HCRTnms, 
+                           inline = TRUE
+        ),
+        checkboxGroupInput("uc13", "Uncertainty cap (low,up):",
+                           choices = setNames(as.list(UCnms_om), UCnms_om),
+                           selected = UCnms_om, 
+                           inline = TRUE
+        ),
+        h4("Figure settings"), 
+        selectInput("idpos13",
+                    label = "Select SIGR and LHSC positions:",
+                    choices = c("SIGR in x-axis","LHSC in x-axis"),
+                    selected = "SIGR in x-axis",
+                    multiple = FALSE
+        ), 
+        width = 3
+      ),
+      mainPanel(
+        plotOutput("plot13", height = "575px"),
+        uiOutput("text13"),
+        width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+} 
