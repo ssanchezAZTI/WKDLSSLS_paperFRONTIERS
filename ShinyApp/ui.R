@@ -14,11 +14,11 @@ shinyUI(navbarPage(
    # collapsible = TRUE,
   fluid = TRUE,
   inverse = TRUE,
-  # windowTitle= tags$head(
-  #   tags$link(rel = "icon", type = "image/png", href = "logos/ANICHO_minilogo.png"),
-  #   tags$title("Adapting simple index-based catch rules for data-limited stocks to short-lived fish stocks’ characteristics")
-  # ),
-  windowTitle = "AZTI VAPEM",
+  windowTitle= tags$head(
+    tags$link(rel = "icon", type = "image/png", href = "logos/FLBEIA_logo.png"),
+    tags$title("Sanchezetal2021Frontiers_interactiveFigs")
+  ),
+  # windowTitle = "Sanchezetal2021Frontiers_interactiveFigs",
   position = "fixed-top",
   #footer = includeHTML("./www/footer.html"), # twitter, disclaimer etc.
   header = tags$style(
@@ -40,7 +40,10 @@ shinyUI(navbarPage(
     fluidRow( 
       br(), br(),
       align = "center",
-      p("Interactive version of the figures in the above publication.")
+      p("Interactive version of the figures in the publication:"),
+      p("Sánchez-Maroño, S., Uriarte, A., Ibaibarriaga, L. and Citores, L. 2021 (under review).
+        Adapting simple index-based catch rules for data-limited stocks to short-lived fish stocks’ characteristics.
+        Frontiers in Marine Science - Marine Fisheries, Aquaculture and Living Resources.")
     ) # to customize as desire
   ), # close home
   
