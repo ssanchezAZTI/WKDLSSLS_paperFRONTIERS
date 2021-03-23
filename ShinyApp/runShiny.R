@@ -29,76 +29,6 @@ library(R.utils)
 
 
 #==============================================================================
-# Load data                                                                ----
-#==============================================================================
-
-# Global variables
-
-load(file.path("data","plotinputs.RData"))
-# dhist, dat_bio, dat_bioQ, df_bc, df_cvid, df_om, ucp.col, ucp.col2, ucp.col3, perfnms, perflabels
-
-plabs <- setNames(perflabels, perfnms)
-
-
-# - Historical part
-
-STKNnms_hist  <- unique(dhist$STKN)
-LHSCnms_hist  <- levels(dhist$LHSC)
-SIGRnms_hist  <- levels(dhist$SIGR)
-FHISTnms_hist <- levels(dhist$FHIST)
-
-
-# - Trajectories
-
-dat_bioQ <- dat_bioQ %>% filter(ADVT != "fix")
-
-STKNnms_q  <- unique(dat_bioQ$STKN)
-FHISTnms_q <- levels(dat_bioQ$FHIST)
-
-
-# - Base Case
-
-df_bc <- df_bc %>% filter(ADVT != "fix")
-
-# Options in variables
-
-STKNnms  <- unique(df_bc$STKN)
-FHISTnms <- levels(df_bc$FHIST)
-TERMnms  <- levels(df_bc$term)
-HCRTnms  <- unique(df_bc$HCRT)
-UCnms    <- unique(df_bc$UC)
-
-TERMdef <- setNames(c("first 5 projection years","next 5 projection years","last 10 projection years"), 
-                    c("short","mid","long"))
-
-
-# BSAFE
-
-HCRTnms_bsafe <- df_bc %>% filter(BSAFE != "none") %>% .$HCRT %>% unique()
-UCnms_bsafe   <- df_bc %>% filter(BSAFE != "none") %>% .$UC %>% unique()
-
-
-
-# - Sensitivity to CVID
-
-STKNnms_cvid  <- unique(df_cvid$STKN)
-FHISTnms_cvid <- levels(df_cvid$FHIST)
-TERMnms_cvid  <- levels(df_cvid$term)
-HCRTnms_cvid  <- unique(df_cvid$HCRT)
-UCnms_cvid    <- unique(df_cvid$UC)
-CVIDnms_cvid  <- levels(df_cvid$CVID)
-
-
-# - Sensitivity to CVID
-
-STKNnms_om  <- unique(df_om$STKN)
-FHISTnms_om <- levels(df_om$FHIST)
-TERMnms_om  <- levels(df_om$term)
-HCRTnms_om  <- unique(df_om$HCRT)
-UCnms_om    <- unique(df_om$UC)
-
-
-#==============================================================================
 # App                                                                      ----
 #==============================================================================
 
@@ -108,5 +38,9 @@ runApp()
 
 # for deployment
 
-# library(rsconnect)
+library(rsconnect)
 # deployApp()
+deployApp(appName = "Sanchezetal2021_FMS")
+
+# to check errors in case of deployment. Alternatively, it's also possible to see the log file of the app in the Shinyapps.io account
+# rsconnect::showLogs(appName = "Sanchezetal2021_FMS")
