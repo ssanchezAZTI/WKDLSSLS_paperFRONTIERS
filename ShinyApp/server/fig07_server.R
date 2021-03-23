@@ -27,7 +27,7 @@ output$plot07 <- renderPlot({
     theme(axis.text.x=element_blank(), 
           text = element_text(size = 18), 
           title = element_text(size = 14, face = "bold"), 
-          strip.text = element_text(size = 16))
+          strip.text = element_text(size = 15))
   
 })
 

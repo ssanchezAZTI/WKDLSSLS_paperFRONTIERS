@@ -122,7 +122,7 @@ fig03panel <- function() {
 fig04panel <- function() {
   
   fluidPage(
-    titlePanel("Historical interannual variation (IAV)"),
+    titlePanel("Trajectories"),
     
     sidebarLayout(
       sidebarPanel(
@@ -162,7 +162,7 @@ fig04panel <- function() {
 fig05panel <- function() {
   
   fluidPage(
-    titlePanel("Trajectories"),
+    titlePanel("Biological risks"),
     
     sidebarLayout(
       sidebarPanel(
@@ -271,7 +271,7 @@ fig06panel <- function() {
 fig07panel <- function() {
   
   fluidPage(
-    titlePanel("Trajectories"),
+    titlePanel("Relative yields"),
     
     sidebarLayout(
       sidebarPanel(
