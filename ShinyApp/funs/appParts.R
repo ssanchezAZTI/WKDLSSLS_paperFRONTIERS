@@ -116,6 +116,46 @@ fig03panel <- function() {
 
 
 #==============================================================================
+# Figure 4                                                                 ----
+#==============================================================================
+
+fig04panel <- function() {
+  
+  fluidPage(
+    titlePanel("Historical interannual variation (IAV)"),
+    
+    sidebarLayout(
+      sidebarPanel(
+        h4("Select variables to plot"),
+        checkboxGroupInput("id04", "Indicator:",
+                           choiceNames = c("catch","ssb"), choiceValues = c("catch","ssb"),
+                           selected = c("catch","ssb"),
+                           inline = TRUE
+        ),
+        checkboxGroupInput("stkn04", "Stock type:",
+                           choiceNames = STKNnms_q, choiceValues = STKNnms_q,
+                           selected = STKNnms_q,
+                           inline = TRUE
+        ),
+        checkboxGroupInput("fhist04", "Historical exploitation level:",
+                           choices = setNames(as.list(FHISTnms_q), FHISTnms_q),
+                           selected = FHISTnms_q,
+                           inline = TRUE
+        ),
+        width = 3
+      ),
+      mainPanel(
+        plotOutput("plot04", height = "575px"),
+        uiOutput("text04"),
+        width = 9
+      )
+    ) # close sidebarLayout
+  ) # close fluidpage
+}
+
+
+
+#==============================================================================
 # Figure 5                                                                 ----
 #==============================================================================
 

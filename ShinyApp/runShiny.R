@@ -25,6 +25,7 @@ library(shinyjs)
 library(markdown)
 
 library(dplyr)
+library(R.utils)
 
 
 #==============================================================================
@@ -47,9 +48,17 @@ SIGRnms_hist  <- levels(dhist$SIGR)
 FHISTnms_hist <- levels(dhist$FHIST)
 
 
+# - Trajectories
+
+dat_bioQ <- dat_bioQ %>% filter(ADVT != "fix")
+
+STKNnms_q  <- unique(dat_bioQ$STKN)
+FHISTnms_q <- levels(dat_bioQ$FHIST)
+
+
 # - Base Case
 
-df_bc <- df_bc %>% filter(ADVT != "fix")# & BSAFE == "none" & indicator %in% perfnms)
+df_bc <- df_bc %>% filter(ADVT != "fix")
 
 # Options in variables
 

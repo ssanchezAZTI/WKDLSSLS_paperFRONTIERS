@@ -354,7 +354,7 @@ perflabels <- c("Risk3.Blim","catch/MSY")
 # SAVE objects                                                             ----
 #==============================================================================
 
-save( dhist, dat_bio, dat_bioQ, df_bc, df_cvid, df_om, 
+save( dhist, proj.yr, dat_bio, dat_bioQ, df_bc, df_cvid, df_om, 
       ucp.col, ucp.col2, ucp.col3, perfnms, perflabels,
       file = file.path(shiny.dir,"plotinputs.RData"))
 
