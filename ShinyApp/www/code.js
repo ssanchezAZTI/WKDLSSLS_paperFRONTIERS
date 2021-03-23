@@ -1,3 +1,0 @@
-$( document ).ready(function() {
-  $( ".navbar .container-fluid" ).append('<div align="right"><a title="Tweet" href="https://twitter.com/intent/tweet?text=SUDOANG (SUDONAG Tool @SUDONAGProject @azti_brta)&url=https://azti.shinyapps.io/shiny_results/" target="_blank"><i style="font-size:25px; padding:5px; margin-right:0px; margin-top:0px; color:white" class="fab fa-twitter"></i></a><a title="LinkedIn" href="https://www.linkedin.com/sharing/share-offsite/?text=SUDOANG (SUDONAG Tool @SUDONAGProject @azti_brta)&url=https://azti.shinyapps.io/shiny_results/" target="_blank"><i style="font-size:25px; padding:5px; margin-right:0px; margin-top:0px; color:white" class="fab fa-linkedin"></i></a></div>');
-});
