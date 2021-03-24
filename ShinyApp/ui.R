@@ -40,10 +40,12 @@ shinyUI(navbarPage(
     fluidRow( 
       br(), br(),
       align = "center",
-      p("Interactive version of the figures in the publication:"),
-      p("Sánchez-Maroño, S., Uriarte, A., Ibaibarriaga, L. and Citores, L. 2021 (under review).
+      h1("Interactive version of the figures in the publication:"),
+      h2("Sánchez-Maroño, S., Uriarte, A., Ibaibarriaga, L. and Citores, L. 2021 (under review).
         Adapting simple index-based catch rules for data-limited stocks to short-lived fish stocks’ characteristics.
-        Frontiers in Marine Science - Marine Fisheries, Aquaculture and Living Resources.")
+        Frontiers in Marine Science - Marine Fisheries, Aquaculture and Living Resources."),
+      HTML("</h4>"),
+      HTML("<center><img src='logos/FLBEIA_logo.jpg' width=450 height=208.8></center>")
     ) # to customize as desire
   ), # close home
   

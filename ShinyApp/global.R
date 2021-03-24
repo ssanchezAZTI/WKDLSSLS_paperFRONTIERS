@@ -112,7 +112,8 @@ UCnms_om    <- unique(df_om$UC)
 
 # - Use named vector to fix the colours for UCs
 
-names(ucp.col) <- unique(df_bc$UC)
+names(ucp.col) <- c("(0.2,0.2)","(0.2,0.25)", "(0.5,0.5)","(0.5,1)","(0.5,1.5)",
+                    "(0.8,0.8)", "(0.8,2.75)","(0.8,4)","(0.8,5.25)","(NA,NA)")
 names(ucp.col2) <- c("(0.5,0.5)","(0.8,0.8)", "(0.8,2.75)","(0.8,4)","(0.8,5.25)","(NA,NA)") 
 names(ucp.col3) <- c("(0.2,0.2)","(0.8,0.8)", "(0.8,4)","(NA,NA)")
   
